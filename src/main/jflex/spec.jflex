@@ -27,7 +27,7 @@ import java_cup.runtime.*;
         System.err.println("Line " + (yyline + 1) + ", Column " + (yycolumn + 1));
         System.err.println(error.comment());
         System.err.println();
-        System.exit(0);
+        //System.exit(0);
     }
 
     private String parseString (String s) {
