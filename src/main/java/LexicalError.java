@@ -1,6 +1,3 @@
-/**
- * Created by dlopez on 12/3/16.
- */
 public enum LexicalError {
     UNCLOSED_COMMENT {
         @Override
@@ -31,6 +28,10 @@ public enum LexicalError {
         public String comment() {
             return "Invalid identifier";
         }
+    },
+    ILEGAL_CHARACTER {
+        @Override
+        public String comment() { return "Illegalcharacter"; }
     };
 
     public abstract String comment();
