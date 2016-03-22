@@ -1,0 +1,6 @@
+program EjemploAprobado;
+var
+    age: INTEGER;
+begin
+    age := 'asd';
+end.

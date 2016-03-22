@@ -1,0 +1,11 @@
+{ asdas }
+program EjemploAprobado;
+{ asdas }
+var
+    age: { asdas }INTEGER;
+begin
+    { asdas }
+    age := 'asd';
+end.
+{ asd
+as }

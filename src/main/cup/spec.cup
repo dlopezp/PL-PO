@@ -1,0 +1,352 @@
+import java_cup.runtime.*;
+
+action code{:
+    public void print (Object o) {
+        System.out.println(o);
+    }
+:}
+
+parser code {:
+    public void syntax_error (Symbol s) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Syntax Error\n");
+        sb.append("left: "+s.left+"\n");
+        sb.append("right: "+s.right+"\n");
+        sb.append("value: "+s.value+"\n");
+        report_error(sb.toString(), null);
+    }
+:}
+
+terminal
+    ADD,
+    AND,
+    ARRAY,
+    ASSIGN,
+    BEGIN,
+    CASE,
+    CHARACTER,
+    COLONS,
+    COMMA,
+    CONST,
+    DIV,
+    DO,
+    DOT,
+    DOUBLE_DOT,
+    ELSE,
+    END,
+    EQ,
+    FOR,
+    FUNCTION,
+    GEQ,
+    GT,
+    IF,
+    INTEGER,
+    LEFT_BRACKET,
+    LEFT_PARENTHESIS,
+    LEQ,
+    LT,
+    MOD,
+    MUL,
+    NEQ,
+    NOT,
+    OF,
+    OR,
+    PROCEDURE,
+    PROGRAM,
+    REAL,
+    RECORD,
+    RIGHT_BRACKET,
+    RIGHT_PARENTHESIS,
+    SEMI_COLONS,
+    SUB,
+    THEN,
+    TO,
+    TYPE,
+    VAR,
+    WHILE
+    ;
+
+terminal String
+    IDENTIFIER,
+    NUMERIC_INTEGER_CONST,
+    NUMERIC_REAL_CONST,
+    STRING_CONST
+    ;
+
+
+non terminal
+    alltypes,
+    asig,
+    blq,
+    case,
+    caselist,
+    ctelist,
+    cond,
+    dcl,
+    dcl_blq,
+    dcllist,
+    dcllist_blq,
+    defcte,
+    deffun,
+    defproc,
+    deftype,
+    defvar,
+    defvarlist,
+    elsecond,
+    exeblq,
+    exp,
+    explist,
+    factor,
+    floop,
+    formal_param,
+    formal_paramlist,
+    id,
+    op,
+    oparit,
+    opcomp,
+    oplog,
+    prg,
+    prog_call,
+    sent,
+    sentlist,
+    simpvalue,
+    subpparamlist,
+    tbas,
+    typelist,
+    udtype,
+    varlist,
+    wloop
+    ;
+
+precedence left ELSE;
+precedence left OR;
+precedence left AND;
+
+precedence left LT;
+precedence left LEQ;
+precedence left GT;
+precedence left GEQ;
+precedence left EQ;
+precedence left NEQ;
+precedence left ADD, SUB;
+precedence left MUL, DIV, MOD;
+
+precedence left NOT;
+precedence left LEFT_PARENTHESIS, RIGHT_PARENTHESIS;
+
+start with prg;
+
+prg ::=
+    PROGRAM IDENTIFIER:i SEMI_COLONS blq DOT
+        {: RESULT = new Program(i); :}
+    ;
+
+blq ::=
+    dcllist BEGIN sentlist END
+    ;
+
+dcllist ::=
+    dcllist dcl
+    | /* empty dcllist */
+    ;
+
+sentlist ::=
+    sent
+    | sentlist sent
+    ;
+
+dcl ::=
+    defcte
+    | defvar
+    | defproc
+    | deffun
+    | deftype
+    ;
+
+defcte ::=
+    CONST ctelist
+    ;
+
+ctelist ::=
+    IDENTIFIER EQ simpvalue SEMI_COLONS
+    | ctelist IDENTIFIER EQ simpvalue SEMI_COLONS
+    ;
+
+simpvalue ::=
+    NUMERIC_INTEGER_CONST
+    | NUMERIC_REAL_CONST
+    | STRING_CONST
+    ;
+
+defvar ::=
+    VAR defvarlist SEMI_COLONS
+    ;
+
+defvarlist ::=
+    varlist COLONS alltypes
+    | defvarlist SEMI_COLONS varlist COLONS alltypes
+    ;
+
+varlist ::=
+    IDENTIFIER
+    | IDENTIFIER COMMA varlist
+    ;
+
+defproc ::=
+    PROCEDURE IDENTIFIER formal_paramlist SEMI_COLONS blq SEMI_COLONS
+    ;
+
+deffun ::=
+    FUNCTION IDENTIFIER formal_paramlist COLONS alltypes SEMI_COLONS blq SEMI_COLONS
+    ;
+
+formal_paramlist ::= LEFT_PARENTHESIS formal_param RIGHT_PARENTHESIS
+    | /* empty formal_paramlist */
+    ;
+
+formal_param ::=
+    varlist COLONS alltypes
+    | varlist COLONS alltypes SEMI_COLONS formal_param
+    ;
+
+tbas ::=
+    INTEGER
+    | REAL
+    | CHARACTER
+    ;
+
+sent ::=
+    asig SEMI_COLONS
+    | prog_call SEMI_COLONS
+    | exeblq
+    | cond
+    | wloop
+    | floop
+    | case
+    ;
+
+asig ::=
+    id ASSIGN exp
+    ;
+
+id ::=
+    IDENTIFIER
+    | IDENTIFIER LEFT_BRACKET exp RIGHT_BRACKET
+    | IDENTIFIER DOT IDENTIFIER
+    ;
+
+exp ::=
+    exp op exp
+    | factor
+    ;
+
+op ::=
+    opcomp
+    | oplog
+    | oparit
+    ;
+
+opcomp ::=
+    LT
+    | GT
+    | LEQ
+    | GEQ
+    | EQ
+    | NEQ
+    ;
+
+oparit ::=
+    ADD
+    | SUB
+    | MUL
+    | DIV
+    | MOD
+    ;
+
+oplog ::=
+    OR
+    | AND
+    ;
+
+factor ::=
+    simpvalue
+    | NOT factor
+    | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS
+    | IDENTIFIER subpparamlist
+    | IDENTIFIER LEFT_BRACKET exp RIGHT_BRACKET
+    | IDENTIFIER DOT IDENTIFIER
+    ;
+
+subpparamlist ::=
+    LEFT_PARENTHESIS explist RIGHT_PARENTHESIS
+    | /* empty subparamlist */
+    ;
+
+explist ::=
+    exp
+    | exp COMMA explist
+    ;
+
+prog_call ::=
+    IDENTIFIER subpparamlist
+    ;
+
+exeblq ::=
+    dcllist_blq BEGIN sentlist END
+    ;
+
+dcllist_blq ::=
+    dcllist_blq SEMI_COLONS dcl_blq
+    | /* empty dcllist_blq */
+    ;
+
+dcl_blq ::=
+    defcte
+    | deftype
+    | defvar
+    ;
+
+deftype ::=
+    TYPE typelist
+    ;
+
+typelist ::=
+    IDENTIFIER EQ udtype SEMI_COLONS
+    | IDENTIFIER EQ udtype SEMI_COLONS typelist
+    ;
+
+udtype ::=
+    ARRAY LEFT_BRACKET simpvalue DOUBLE_DOT simpvalue RIGHT_BRACKET OF alltypes
+    | RECORD defvarlist END
+    ;
+
+alltypes ::=
+    tbas
+    | IDENTIFIER
+    ;
+
+cond ::=
+    IF exp THEN sent elsecond
+    ;
+
+elsecond ::=
+    ELSE sent
+    | /* empty elsecond */
+    ;
+
+wloop ::=
+    WHILE exp DO sent
+    ;
+
+floop ::=
+    FOR IDENTIFIER ASSIGN exp TO exp DO sent
+    ;
+
+case ::=
+    CASE exp OF caselist END
+    ;
+
+caselist ::=
+    exp COLONS sent SEMI_COLONS
+    | exp COLONS sent SEMI_COLONS caselist
+    ;
