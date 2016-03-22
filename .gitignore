@@ -14,3 +14,7 @@
 # Maven
 log/
 target/
+
+Lexer.java
+Parser.java
+sym.java
