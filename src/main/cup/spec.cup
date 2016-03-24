@@ -1,23 +1,49 @@
 import java_cup.runtime.*;
+import java.util.List;
+import java.util.ArrayList;
+
+import symbols.Location;
+import symbols.SymbolFactory;
+import symbols.PLSymbol;
+import symbols.TerminalSymbol;
 
 action code{:
-    public void print (Object o) {
-        System.out.println(o);
+    private int errors = 0;
+
+    public int getErrors() {
+        return errors;
+    }
+
+    public void error(SyntaxError error, PLSymbol symbol) {
+        errors++;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SyntaxError => ");
+        sb.append(error.location(symbol));
+        sb.append(": " + error.comment());
+        System.out.println(sb.toString());
     }
 :}
 
 parser code {:
-    public void syntax_error (Symbol s) {
+    public void syntax_error (Symbol currentToken) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Syntax Error\n");
-        sb.append("left: "+s.left+"\n");
-        sb.append("right: "+s.right+"\n");
-        sb.append("value: "+s.value+"\n");
+        sb.append("Syntax Error => ");
+        sb.append(", Line: "+currentToken.left);
+        sb.append(", Column: "+currentToken.right);
+        sb.append(", Value: "+currentToken.value);
+        List<Integer> ids = expected_token_ids();
+        sb.append("\nExpected: ");
+        for (Integer id:ids) {
+            sb.append(symbl_name_from_id(id)+", ");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("\n");
         report_error(sb.toString(), null);
     }
 :}
 
-terminal
+terminal String
     ADD,
     AND,
     ARRAY,
@@ -74,7 +100,7 @@ terminal String
     ;
 
 
-non terminal
+non terminal PLSymbol
     alltypes,
     asig,
     blq,
@@ -101,6 +127,7 @@ non terminal
     formal_param,
     formal_paramlist,
     id,
+    initial,
     op,
     oparit,
     opcomp,
@@ -118,6 +145,8 @@ non terminal
     wloop
     ;
 
+precedence left SEMI_COLONS;
+
 precedence left ELSE;
 precedence left OR;
 precedence left AND;
@@ -134,11 +163,14 @@ precedence left MUL, DIV, MOD;
 precedence left NOT;
 precedence left LEFT_PARENTHESIS, RIGHT_PARENTHESIS;
 
-start with prg;
+start with initial;
+
+initial ::=
+    prg
+        {: RESULT = SymbolFactory.result(errors); :};
 
 prg ::=
-    PROGRAM IDENTIFIER:i SEMI_COLONS blq DOT
-        {: RESULT = new Program(i); :}
+    PROGRAM IDENTIFIER SEMI_COLONS blq DOT
     ;
 
 blq ::=
@@ -146,17 +178,17 @@ blq ::=
     ;
 
 dcllist ::=
-    dcllist dcl
+      dcllist dcl
     | /* empty dcllist */
     ;
 
 sentlist ::=
-    sent
+      sent
     | sentlist sent
     ;
 
 dcl ::=
-    defcte
+      defcte
     | defvar
     | defproc
     | deffun
@@ -168,14 +200,17 @@ defcte ::=
     ;
 
 ctelist ::=
-    IDENTIFIER EQ simpvalue SEMI_COLONS
+      IDENTIFIER EQ simpvalue SEMI_COLONS
     | ctelist IDENTIFIER EQ simpvalue SEMI_COLONS
     ;
 
 simpvalue ::=
-    NUMERIC_INTEGER_CONST
-    | NUMERIC_REAL_CONST
-    | STRING_CONST
+      NUMERIC_INTEGER_CONST:value
+        {: RESULT = SymbolFactory.simpvalue(value, valueleft, valueright); :}
+    | NUMERIC_REAL_CONST:value
+        {: RESULT = SymbolFactory.simpvalue(value, valueleft, valueright); :}
+    | STRING_CONST:value
+        {: RESULT = SymbolFactory.simpvalue(value, valueleft, valueright); :}
     ;
 
 defvar ::=
@@ -183,12 +218,12 @@ defvar ::=
     ;
 
 defvarlist ::=
-    varlist COLONS alltypes
+      varlist COLONS alltypes
     | defvarlist SEMI_COLONS varlist COLONS alltypes
     ;
 
 varlist ::=
-    IDENTIFIER
+      IDENTIFIER
     | IDENTIFIER COMMA varlist
     ;
 
@@ -200,24 +235,29 @@ deffun ::=
     FUNCTION IDENTIFIER formal_paramlist COLONS alltypes SEMI_COLONS blq SEMI_COLONS
     ;
 
-formal_paramlist ::= LEFT_PARENTHESIS formal_param RIGHT_PARENTHESIS
+formal_paramlist ::=
+      LEFT_PARENTHESIS formal_param RIGHT_PARENTHESIS
     | /* empty formal_paramlist */
     ;
 
 formal_param ::=
-    varlist COLONS alltypes
+      varlist COLONS alltypes
     | varlist COLONS alltypes SEMI_COLONS formal_param
     ;
 
 tbas ::=
-    INTEGER
+      INTEGER
     | REAL
     | CHARACTER
     ;
 
 sent ::=
-    asig SEMI_COLONS
+      asig SEMI_COLONS
+    | asig:a
+        {: error(SyntaxError.MISSING_SEMI_COLONS, a); :}
     | prog_call SEMI_COLONS
+    | prog_call:pc
+        {: error(SyntaxError.MISSING_SEMI_COLONS, pc); :}
     | exeblq
     | cond
     | wloop
@@ -226,28 +266,31 @@ sent ::=
     ;
 
 asig ::=
-    id ASSIGN exp
+      id:id ASSIGN:assign exp:exp
+        {: RESULT = SymbolFactory.asig(id, assign, exp); :}
     ;
 
 id ::=
-    IDENTIFIER
+      IDENTIFIER:identifier
+        {: RESULT = SymbolFactory.id(identifier, identifierleft, identifierright); :}
     | IDENTIFIER LEFT_BRACKET exp RIGHT_BRACKET
     | IDENTIFIER DOT IDENTIFIER
     ;
 
 exp ::=
-    exp op exp
-    | factor
+      exp op exp
+    | factor:factor
+        {: RESULT = SymbolFactory.exp(factor); :}
     ;
 
 op ::=
-    opcomp
+      opcomp
     | oplog
     | oparit
     ;
 
 opcomp ::=
-    LT
+      LT
     | GT
     | LEQ
     | GEQ
@@ -256,7 +299,7 @@ opcomp ::=
     ;
 
 oparit ::=
-    ADD
+      ADD
     | SUB
     | MUL
     | DIV
@@ -264,12 +307,13 @@ oparit ::=
     ;
 
 oplog ::=
-    OR
+      OR
     | AND
     ;
 
 factor ::=
-    simpvalue
+      simpvalue:simpvalue
+        {: RESULT = SymbolFactory.factor(simpvalue); :}
     | NOT factor
     | LEFT_PARENTHESIS exp RIGHT_PARENTHESIS
     | IDENTIFIER subpparamlist
@@ -278,12 +322,12 @@ factor ::=
     ;
 
 subpparamlist ::=
-    LEFT_PARENTHESIS explist RIGHT_PARENTHESIS
-    | /* empty subparamlist */
+      LEFT_PARENTHESIS explist RIGHT_PARENTHESIS
+    | /* empty subpparamlist */
     ;
 
 explist ::=
-    exp
+      exp
     | exp COMMA explist
     ;
 
@@ -296,12 +340,12 @@ exeblq ::=
     ;
 
 dcllist_blq ::=
-    dcllist_blq SEMI_COLONS dcl_blq
+      dcllist_blq SEMI_COLONS dcl_blq
     | /* empty dcllist_blq */
     ;
 
 dcl_blq ::=
-    defcte
+      defcte
     | deftype
     | defvar
     ;
@@ -311,17 +355,17 @@ deftype ::=
     ;
 
 typelist ::=
-    IDENTIFIER EQ udtype SEMI_COLONS
+      IDENTIFIER EQ udtype SEMI_COLONS
     | IDENTIFIER EQ udtype SEMI_COLONS typelist
     ;
 
 udtype ::=
-    ARRAY LEFT_BRACKET simpvalue DOUBLE_DOT simpvalue RIGHT_BRACKET OF alltypes
+      ARRAY LEFT_BRACKET simpvalue DOUBLE_DOT simpvalue RIGHT_BRACKET OF alltypes
     | RECORD defvarlist END
     ;
 
 alltypes ::=
-    tbas
+      tbas
     | IDENTIFIER
     ;
 
@@ -330,7 +374,7 @@ cond ::=
     ;
 
 elsecond ::=
-    ELSE sent
+      ELSE sent
     | /* empty elsecond */
     ;
 
@@ -347,6 +391,6 @@ case ::=
     ;
 
 caselist ::=
-    exp COLONS sent SEMI_COLONS
+      exp COLONS sent SEMI_COLONS
     | exp COLONS sent SEMI_COLONS caselist
     ;

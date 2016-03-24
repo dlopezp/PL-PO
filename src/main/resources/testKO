@@ -1,4 +1,4 @@
-(*
-asdad
-
-program sadasd;
+program EjemploAprobado;
+begin
+	valor1 := 4
+end.

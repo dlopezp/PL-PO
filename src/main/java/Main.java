@@ -1,3 +1,5 @@
+import symbols.ResultPLSymbol;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
@@ -14,8 +16,9 @@ public class Main {
                 try {
                     lexer = new Lexer(new FileReader(args[i]));
                     Parser parser = new Parser(lexer);
-                    Program prg = (Program) parser.parse().value;
-                    System.out.println(prg);
+                    ResultPLSymbol result = (ResultPLSymbol) parser.parse().value;
+
+                    System.out.println("\nSalida: \n"+ result);
                 }
                 catch (FileNotFoundException e) {
                     System.out.println("Archivo \""+args[i]+"\" no encontrado.");
