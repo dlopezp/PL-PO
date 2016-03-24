@@ -9,17 +9,24 @@ import java_cup.runtime.*;
 %line
 %column
 
+%init{
+%init}
+
 %{
     private static boolean DEBUG = false;
 
     private Symbol symbol(int type) {
-        if (DEBUG) print(String.valueOf(type) + " " + yytext());
-        return new Symbol(type, yyline+1, yycolumn+1);
+        return symbol(type, yyline+1, yycolumn+1, yytext());
     }
 
     private Symbol symbol(int type, Object value) {
-        if (DEBUG) print(String.valueOf(type) + " " + yytext());
-        return new Symbol(type, yyline+1, yycolumn+1, value);
+        return symbol(type, yyline+1, yycolumn+1, value);
+    }
+
+    private Symbol symbol(int type, int line, int column, Object value) {
+        String intFormat = "%3d";
+        if (DEBUG) print("LexDebug => (" + String.format(intFormat, line) +", "+String.format(intFormat, column)+") ["+String.format(intFormat, type)+"] " + value);
+        return new Symbol(type, line, column, value);
     }
 
     private void error (LexicalError error) {
@@ -44,10 +51,8 @@ import java_cup.runtime.*;
     }
 %}
 
-/*
 %eof{
 %eof}
-*/
 
 LineTerminator = \r|\n|\r\n
 //InputCharacter = [^\r\n]
@@ -73,7 +78,7 @@ InvalidComment2 = {CommentDelimiterBegin2} ([^(*\))])+
 Comment2 = {InvalidComment2}{CommentDelimiterEnd2}
 
 Comment = {Comment1} | {Comment2}
-InvalidComment = {InvalidComment1} | {InvalidComment2}
+//InvalidComment = {InvalidComment1} | {InvalidComment2}
 CommentDelimiterEnd = {CommentDelimiterEnd1} | {CommentDelimiterEnd2}
 
 /* identifiers */
@@ -81,9 +86,9 @@ IdentifierFirstChar = {Letter} | "_"
 IdentifierValidChar = {IdentifierFirstChar} | {Number}
 Identifier = {IdentifierFirstChar} {IdentifierValidChar}*
 
-InvalidIdentifierFirstChar = [^a-zA-Z_ \t\f\r\n]
-IdentifierInvalidChar = [^a-zA-Z_0-9 \t\f\r\n]
-InvalidIdentifier = {InvalidIdentifierFirstChar} {IdentifierValidChar}?
+//InvalidIdentifierFirstChar = [^a-zA-Z_ \t\f\r\n]
+//IdentifierInvalidChar = [^a-zA-Z_0-9 \t\f\r\n]
+//InvalidIdentifier = {InvalidIdentifierFirstChar} {IdentifierValidChar}?
 
 /* integer literals */
 Sign = [+-]
@@ -113,7 +118,7 @@ UnopenString = ({StringValidContent})* {StringDelimiter};
 String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
 //String2 = {UnclosedString} {StringDelimiter}
 
-%s COMMENT_1, COMMENT_2
+//%s COMMENT_1, COMMENT_2
 
 %%
 
@@ -138,7 +143,7 @@ String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
     }
 
     {String} {
-        print("String: "); return symbol(sym.STRING_CONST, parseString(yytext()));
+        return symbol(sym.STRING_CONST, parseString(yytext()));
     }
 
     {UnclosedString} {
@@ -151,70 +156,70 @@ String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
         error(LexicalError.UNOPEN_STRING);
     }
 
-    "array"             { print();return symbol(sym.ARRAY); }
-    "begin"             { print();return symbol(sym.BEGIN); }
-    "case"              { print();return symbol(sym.CASE); }
-    "const"             { print();return symbol(sym.CONST); }
-    "do"                { print();return symbol(sym.DO); }
-    "else"              { print();return symbol(sym.ELSE); }
-    "end"               { print();return symbol(sym.END); }
-    "for"               { print();return symbol(sym.FOR); }
-    "function"          { print();return symbol(sym.FUNCTION); }
-    "if"                { print();return symbol(sym.IF); }
-    "of"                { print();return symbol(sym.OF); }
-    "procedure"         { print();return symbol(sym.PROCEDURE); }
+    "array"             { return symbol(sym.ARRAY); }
+    "begin"             { return symbol(sym.BEGIN); }
+    "case"              { return symbol(sym.CASE); }
+    "const"             { return symbol(sym.CONST); }
+    "do"                { return symbol(sym.DO); }
+    "else"              { return symbol(sym.ELSE); }
+    "end"               { return symbol(sym.END); }
+    "for"               { return symbol(sym.FOR); }
+    "function"          { return symbol(sym.FUNCTION); }
+    "if"                { return symbol(sym.IF); }
+    "of"                { return symbol(sym.OF); }
+    "procedure"         { return symbol(sym.PROCEDURE); }
 
-    "program"           { print();return symbol(sym.PROGRAM); }
+    "program"           { return symbol(sym.PROGRAM); }
 
-    "record"            { print();return symbol(sym.RECORD); }
-    "then"              { print();return symbol(sym.THEN); }
-    "to"                { print();return symbol(sym.TO); }
-    "type"              { print();return symbol(sym.TYPE); }
-    "var"               { print();return symbol(sym.VAR); }
-    "while"             { print();return symbol(sym.WHILE); }
+    "record"            { return symbol(sym.RECORD); }
+    "then"              { return symbol(sym.THEN); }
+    "to"                { return symbol(sym.TO); }
+    "type"              { return symbol(sym.TYPE); }
+    "var"               { return symbol(sym.VAR); }
+    "while"             { return symbol(sym.WHILE); }
 
-    "INTEGER"           { print();return symbol(sym.INTEGER); }
-    "REAL"              { print();return symbol(sym.REAL); }
-    "CHARACTER"         { print();return symbol(sym.CHARACTER); }
+    "INTEGER"           { return symbol(sym.INTEGER); }
+    "REAL"              { return symbol(sym.REAL); }
+    "CHARACTER"         { return symbol(sym.CHARACTER); }
 
-    ";"                 { print();return symbol(sym.SEMI_COLONS); }
+    ";"                 { return symbol(sym.SEMI_COLONS); }
 
-    ":"                 { print();return symbol(sym.COLONS); }
-    ".."                { print();return symbol(sym.DOUBLE_DOT); }
-    "."                 { print();return symbol(sym.DOT); }
-    ","                 { print();return symbol(sym.COMMA); }
-    "("                 { print();return symbol(sym.LEFT_PARENTHESIS); }
-    ")"                 { print();return symbol(sym.RIGHT_PARENTHESIS); }
-    "["                 { print();return symbol(sym.LEFT_BRACKET); }
-    "]"                 { print();return symbol(sym.RIGHT_BRACKET); }
+    ":"                 { return symbol(sym.COLONS); }
+    ".."                { return symbol(sym.DOUBLE_DOT); }
+    "."                 { return symbol(sym.DOT); }
+    ","                 { return symbol(sym.COMMA); }
+    "("                 { return symbol(sym.LEFT_PARENTHESIS); }
+    ")"                 { return symbol(sym.RIGHT_PARENTHESIS); }
+    "["                 { return symbol(sym.LEFT_BRACKET); }
+    "]"                 { return symbol(sym.RIGHT_BRACKET); }
 
-    ":="                { print();return symbol(sym.ASSIGN); }
+    ":="                { return symbol(sym.ASSIGN); }
 
-    "="                 { print();return symbol(sym.EQ); }
-    "<>"                { print();return symbol(sym.NEQ); }
-    ">"                 { print();return symbol(sym.GT); }
-    ">="                { print();return symbol(sym.GEQ); }
-    "<"                 { print();return symbol(sym.LT); }
-    "<="                { print();return symbol(sym.LEQ); }
+    "="                 { return symbol(sym.EQ); }
+    "<>"                { return symbol(sym.NEQ); }
+    ">"                 { return symbol(sym.GT); }
+    ">="                { return symbol(sym.GEQ); }
+    "<"                 { return symbol(sym.LT); }
+    "<="                { return symbol(sym.LEQ); }
 
-    "+"                 { print();return symbol(sym.ADD); }
-    "-"                 { print();return symbol(sym.SUB); }
-    "*"                 { print();return symbol(sym.MUL); }
-    "div"               { print();return symbol(sym.DIV); }
-    "mod"               { print();return symbol(sym.MOD); }
+    "+"                 { return symbol(sym.ADD); }
+    "-"                 { return symbol(sym.SUB); }
+    "*"                 { return symbol(sym.MUL); }
+    "div"               { return symbol(sym.DIV); }
+    "mod"               { return symbol(sym.MOD); }
 
-    "and"               { print();return symbol(sym.AND); }
-    "not"               { print();return symbol(sym.NOT); }
-    "or"                { print();return symbol(sym.OR); }
+    "and"               { return symbol(sym.AND); }
+    "not"               { return symbol(sym.NOT); }
+    "or"                { return symbol(sym.OR); }
 
 
-    {DecimalConstant}   { return symbol(sym.NUMERIC_INTEGER_CONST, yytext()); }
-    {FloatConstant}     { return symbol(sym.NUMERIC_REAL_CONST, yytext()); }
+    {DecimalConstant}   { return symbol(sym.NUMERIC_INTEGER_CONST); }
+    {FloatConstant}     { return symbol(sym.NUMERIC_REAL_CONST); }
 
-    {Identifier}        { return symbol(sym.IDENTIFIER, yytext()); }
+    {Identifier}        { return symbol(sym.IDENTIFIER); }
     /*
     {InvalidIdentifier} {
-        print(); error(LexicalError.INVALID_IDENTIFIER);
+         error(LexicalError.INVALID_IDENTIFIER);
     }
     */
     {WhiteSpace}        {}
