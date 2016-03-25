@@ -42,4 +42,13 @@ public class SymbolFactory {
     public static PLSymbol asig(PLSymbol id, Object assign, PLSymbol exp) {
         return new AsigPLSymbol((IdPLSymbol) id, (String) assign, (ExpPLSymbol) exp);
     }
+
+    public static PLSymbol alltypes(PLSymbol tbas) {
+        return AllTypesPLSymbol.build((TbasPLSymbol) tbas);
+    }
+
+    public static PLSymbol alltypes(String identifier, int line, int column) {
+        return AllTypesPLSymbol.build(identifier, line, column);
+    }
+
 }
