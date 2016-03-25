@@ -55,4 +55,8 @@ public class SymbolFactory {
         return new VarListPLSymbol(terminal(identifier, line, column));
     }
 
+    public static PLSymbol defvarlist(PLSymbol varlist, PLSymbol alltypes) {
+        return new DefVarListPLSymbol((VarListPLSymbol) varlist, (AllTypesPLSymbol) alltypes);
+    }
+
 }
