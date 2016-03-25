@@ -10,9 +10,9 @@ public class CaseListPLSymbol extends PLSymbol {
 
     private List<CaseSimplePLSymbol> cases;
 
-    CaseListPLSymbol(ExpPLSymbol exp, SentPLSymbol sent) {
+    CaseListPLSymbol(ExpPLSymbol exp, TerminalSymbol colons, SentPLSymbol sent, TerminalSymbol semiColons) {
         cases = new ArrayList<CaseSimplePLSymbol>();
-        addCase(new CaseSimplePLSymbol(exp, sent));
+        addCase(new CaseSimplePLSymbol(exp, colons, sent, semiColons));
     }
 
     public void addCase(CaseSimplePLSymbol caseSimple) {
@@ -21,6 +21,6 @@ public class CaseListPLSymbol extends PLSymbol {
 
     @Override
     public Location endLocation() {
-        return null;
+        return cases.get(0).endLocation();
     }
 }
