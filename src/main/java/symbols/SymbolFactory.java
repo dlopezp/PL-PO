@@ -51,4 +51,8 @@ public class SymbolFactory {
         return AllTypesPLSymbol.build(identifier, line, column);
     }
 
+    public static PLSymbol varlist(String identifier, int line, int column) {
+        return new VarListPLSymbol(terminal(identifier, line, column));
+    }
+
 }
