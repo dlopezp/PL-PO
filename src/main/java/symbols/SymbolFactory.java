@@ -100,4 +100,8 @@ public class SymbolFactory {
     public static PLSymbol udtype(TerminalSymbol record, PLSymbol defvarlist, TerminalSymbol end) {
         return new UdTypePLSymbol(record, defvarlist, end);
     }
+
+    public static PLSymbol typelist(TerminalSymbol identifier, TerminalSymbol eq, PLSymbol udtype, TerminalSymbol semiColons) {
+        return new TypeListPLSymbol(identifier, eq, udtype, semiColons);
+    }
 }
