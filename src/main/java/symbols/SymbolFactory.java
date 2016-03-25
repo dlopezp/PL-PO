@@ -93,4 +93,7 @@ public class SymbolFactory {
         return new ElseCondPLSymbol(else_, sent);
     }
 
+    public static PLSymbol cond(TerminalSymbol if_, PLSymbol exp, TerminalSymbol then, PLSymbol sent, PLSymbol elsecond) {
+        return new CondPLSymbol(if_, exp, then, sent, elsecond);
+    }
 }
