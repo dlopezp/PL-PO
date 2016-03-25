@@ -104,4 +104,8 @@ public class SymbolFactory {
     public static PLSymbol typelist(TerminalSymbol identifier, TerminalSymbol eq, PLSymbol udtype, TerminalSymbol semiColons) {
         return new TypeListPLSymbol(identifier, eq, udtype, semiColons);
     }
+
+    public static PLSymbol deftype(TerminalSymbol type, PLSymbol typelist) {
+        return new DefType(type, typelist);
+    }
 }
