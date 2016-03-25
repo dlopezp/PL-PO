@@ -17,7 +17,6 @@ public class WLoopPLSymbol extends PLSymbol {
             SentPLSymbol sent
     ) {
         super();
-
         this.while_ = while_;
         this.exp = exp;
         this.do_ = do_;

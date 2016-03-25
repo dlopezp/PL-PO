@@ -10,7 +10,6 @@ public class ElseCondPLSymbol extends PLSymbol {
 
     public ElseCondPLSymbol(TerminalSymbol else_, SentPLSymbol sent) {
         super();
-
         this.else_ = else_;
         this.sent = sent;
     }

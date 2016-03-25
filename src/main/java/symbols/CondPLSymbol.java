@@ -13,7 +13,6 @@ public class CondPLSymbol extends PLSymbol {
 
     public CondPLSymbol(TerminalSymbol if_, PLSymbol exp, TerminalSymbol then, PLSymbol sent, PLSymbol elsecond) {
         super();
-
         this.if_ = if_;
         this.exp = exp;
         this.then = then;

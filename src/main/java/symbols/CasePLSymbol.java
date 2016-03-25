@@ -18,6 +18,7 @@ public class CasePLSymbol extends PLSymbol {
             CaseListPLSymbol caselist,
             TerminalSymbol end
     ) {
+        super();
         this.case_ = case_;
         this.exp = exp;
         this.of = of;

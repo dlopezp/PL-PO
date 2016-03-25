@@ -11,6 +11,7 @@ public class CaseListPLSymbol extends PLSymbol {
     private List<CaseSimplePLSymbol> cases;
 
     CaseListPLSymbol(ExpPLSymbol exp, TerminalSymbol colons, SentPLSymbol sent, TerminalSymbol semiColons) {
+        super();
         cases = new ArrayList<CaseSimplePLSymbol>();
         addCase(new CaseSimplePLSymbol(exp, colons, sent, semiColons));
     }
