@@ -80,4 +80,13 @@ public class SymbolFactory {
         return new FLoopPLSymbol(for_, identifier, assign, expA, to, expB, do_, sent);
     }
 
+    public static PLSymbol wloop(
+            TerminalSymbol while_,
+            ExpPLSymbol exp,
+            TerminalSymbol do_,
+            SentPLSymbol sent
+    ) {
+        return new WLoopPLSymbol(while_, exp, do_, sent);
+    }
+
 }
