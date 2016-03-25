@@ -67,4 +67,17 @@ public class SymbolFactory {
         return new CasePLSymbol(case_, exp, of, caselist, end);
     }
 
+    public static PLSymbol floop(
+            TerminalSymbol for_,
+            TerminalSymbol identifier,
+            TerminalSymbol assign,
+            ExpPLSymbol expA,
+            TerminalSymbol to,
+            ExpPLSymbol expB,
+            TerminalSymbol do_,
+            SentPLSymbol sent
+    ) {
+        return new FLoopPLSymbol(for_, identifier, assign, expA, to, expB, do_, sent);
+    }
+
 }
