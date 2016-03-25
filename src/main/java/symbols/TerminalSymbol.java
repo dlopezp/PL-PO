@@ -3,7 +3,7 @@ package symbols;
 /**
  * Created by dlopez on 24/3/16.
  */
-public class TerminalSymbol implements Localizable {
+public class TerminalSymbol extends PLSymbol {
 
     private String value;
     private Location location;
