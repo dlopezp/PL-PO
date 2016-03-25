@@ -63,6 +63,7 @@ LetterLower = [a-z]
 LetterUpper = [A-Z]
 Letter = {LetterLower} | {LetterUpper}
 
+Digit = [0-9]
 NumberNatural = [1-9]
 Number = 0 | {NumberNatural}*
 
@@ -101,8 +102,9 @@ HexDecimalConstant = "$" {Sign}? {HexDigit}+
 DecimalConstant = {IntegerDecimalConstant} | {HexDecimalConstant}
 
 /* floating point literals */
-IntegerFloatConstant = {IntegerDecimalConstant} "." {Number}+
-HexFloatConstant = {HexDecimalConstant} "." {HexDigit}
+//IntegerFloatConstant = {IntegerDecimalConstant} "." [0-9]+
+IntegerFloatConstant = {IntegerDecimalConstant} "." {Digit}+
+HexFloatConstant = {HexDecimalConstant} "." {HexDigit}+
 FloatConstant = {IntegerFloatConstant} | {HexFloatConstant}
 
 //NumericConstant = {DecimalConstant} | {FloatConstant}
