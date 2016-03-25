@@ -9,8 +9,8 @@ public abstract class AllTypesPLSymbol extends PLSymbol {
         return new AllTypesPLSymbolTbas(tbas);
     }
 
-    public static AllTypesPLSymbol build(String identifier, int line, int column) {
-        return new AllTypesPLSymbolId(SymbolFactory.terminal(identifier, line, column));
+    public static AllTypesPLSymbol build(TerminalSymbol identifier) {
+        return new AllTypesPLSymbolId(identifier);
     }
 
 }

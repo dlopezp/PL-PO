@@ -47,8 +47,8 @@ public class SymbolFactory {
         return AllTypesPLSymbol.build((TbasPLSymbol) tbas);
     }
 
-    public static PLSymbol alltypes(String identifier, int line, int column) {
-        return AllTypesPLSymbol.build(identifier, line, column);
+    public static PLSymbol alltypes(TerminalSymbol identifier) {
+        return AllTypesPLSymbol.build(identifier);
     }
 
     public static PLSymbol varlist(String identifier, int line, int column) {
