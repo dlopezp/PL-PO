@@ -89,4 +89,8 @@ public class SymbolFactory {
         return new WLoopPLSymbol(while_, exp, do_, sent);
     }
 
+    public static PLSymbol elsecond(TerminalSymbol else_, SentPLSymbol sent) {
+        return new ElseCondPLSymbol(else_, sent);
+    }
+
 }
