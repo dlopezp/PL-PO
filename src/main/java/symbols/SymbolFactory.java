@@ -59,4 +59,8 @@ public class SymbolFactory {
         return new DefVarListPLSymbol((VarListPLSymbol) varlist, (AllTypesPLSymbol) alltypes);
     }
 
+    public static PLSymbol caselist(PLSymbol exp, PLSymbol sent) {
+        return new CaseListPLSymbol((ExpPLSymbol) exp, (SentPLSymbol) sent);
+    }
+
 }
