@@ -96,4 +96,8 @@ public class SymbolFactory {
     public static PLSymbol cond(TerminalSymbol if_, PLSymbol exp, TerminalSymbol then, PLSymbol sent, PLSymbol elsecond) {
         return new CondPLSymbol(if_, exp, then, sent, elsecond);
     }
+
+    public static PLSymbol udtype(TerminalSymbol record, PLSymbol defvarlist, TerminalSymbol end) {
+        return new UdTypePLSymbol(record, defvarlist, end);
+    }
 }
