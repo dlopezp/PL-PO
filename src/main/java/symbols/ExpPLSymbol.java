@@ -12,7 +12,7 @@ public class ExpPLSymbol extends PLSymbol {
     }
 
     @Override
-    Location endLocation() {
+    public Location endLocation() {
         return factor.endLocation();
     }
 }

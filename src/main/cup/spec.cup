@@ -2,6 +2,8 @@ import java_cup.runtime.*;
 import java.util.List;
 import java.util.ArrayList;
 
+import symbols.Localizable;
+
 import symbols.Location;
 import symbols.SymbolFactory;
 import symbols.PLSymbol;
@@ -14,7 +16,7 @@ action code{:
         return errors;
     }
 
-    public void error(SyntaxError error, PLSymbol symbol) {
+    public void error(SyntaxError error, Localizable symbol) {
         errors++;
         StringBuilder sb = new StringBuilder();
         sb.append("SyntaxError => ");

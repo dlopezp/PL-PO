@@ -12,7 +12,7 @@ public class IdPLSymbol extends PLSymbol {
     }
 
     @Override
-    Location endLocation() {
+    public Location endLocation() {
         return identifier.getLocation();
     }
 }

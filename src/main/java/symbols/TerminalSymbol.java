@@ -3,7 +3,7 @@ package symbols;
 /**
  * Created by dlopez on 24/3/16.
  */
-public class TerminalSymbol {
+public class TerminalSymbol implements Localizable {
 
     private String value;
     private Location location;
@@ -17,7 +17,7 @@ public class TerminalSymbol {
         return location;
     }
 
-    public Location getEndLocation() {
+    public Location endLocation() {
         return SymbolFactory.location(location.getLine(), location.getColumn() + value.length());
     }
 }

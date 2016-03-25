@@ -12,7 +12,7 @@ public class SentPLSymbol extends PLSymbol {
     }
 
     @Override
-    Location endLocation() {
+    public Location endLocation() {
         return asig.endLocation();
     }
 }

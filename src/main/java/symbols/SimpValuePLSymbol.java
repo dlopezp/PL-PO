@@ -12,7 +12,7 @@ public class SimpValuePLSymbol extends PLSymbol {
     }
 
     @Override
-    Location endLocation() {
-        return value.getEndLocation();
+    public Location endLocation() {
+        return value.endLocation();
     }
 }

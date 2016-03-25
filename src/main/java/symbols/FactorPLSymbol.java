@@ -12,7 +12,7 @@ public class FactorPLSymbol extends PLSymbol {
     }
 
     @Override
-    Location endLocation() {
+    public Location endLocation() {
         return simpValue.endLocation();
     }
 }

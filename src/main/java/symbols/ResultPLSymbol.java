@@ -17,7 +17,7 @@ public class ResultPLSymbol extends PLSymbol {
     }
 
     @Override
-    Location endLocation() {
+    public Location endLocation() {
         return null;
     }
 }

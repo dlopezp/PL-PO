@@ -1,7 +1,7 @@
 package symbols;
 
-public abstract class PLSymbol {
+public abstract class PLSymbol implements Localizable {
 
-    abstract Location endLocation();
+    public abstract Location endLocation();
 
 }
