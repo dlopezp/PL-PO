@@ -1,10 +1,9 @@
-{ 'aaa' (* sd *)
- asd}
-(* 'bbb' {asd}
- asd*)
 program EjemploAprobado;
 var
     age: INTEGER;
 begin
     age := 'a(*{s}*)d';
+    case 1 of
+        1: age := 1;
+    end
 end.
