@@ -6,7 +6,7 @@ public class ProgCallPLSymbol extends PLSymbol {
     private final SubParamListPLSymbol subParamList;
 
     public ProgCallPLSymbol(TerminalSymbol identifier, SubParamListPLSymbol subparamlist) {
-        super(subparamlist);
+        super(subparamlist != null ? subparamlist : identifier);
         this.identifier = identifier;
         this.subParamList = subparamlist;
     }

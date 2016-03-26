@@ -9,7 +9,7 @@ public class CondPLSymbol extends PLSymbol {
     private final PLSymbol elsecond;
 
     public CondPLSymbol(TerminalSymbol if_, PLSymbol exp, TerminalSymbol then, PLSymbol sent, PLSymbol elsecond) {
-        super(elsecond);
+        super(elsecond != null ? elsecond : sent);
         this.if_ = if_;
         this.exp = exp;
         this.then = then;

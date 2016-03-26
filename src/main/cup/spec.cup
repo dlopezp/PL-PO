@@ -186,8 +186,9 @@ prg ::=
     | PROGRAM:program IDENTIFIER:identifier blq:blq DOT:dot
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, dot);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(dot);
 
-        RESULT = PLSymbolFactory.prg(program, identifier, null, blq, dot);
+        RESULT = PLSymbolFactory.prg(program, identifier, fakeSemiColons, blq, dot);
     :}
     ;
 
@@ -269,6 +270,13 @@ cte ::=
     {:
         RESULT = PLSymbolFactory.cte(identifier, eq, simpvalue, semiColons);
     :}
+    | IDENTIFIER:identifier EQ:eq simpvalue:simpvalue
+    {:
+        error(SyntaxError.MISSING_SEMI_COLONS, simpvalue);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(simpvalue);
+
+        RESULT = PLSymbolFactory.cte(identifier, eq, simpvalue, fakeSemiColons);
+    :}
     ;
 
 simpvalue ::=
@@ -294,8 +302,9 @@ defvar ::=
     | VAR:var defvarlist:defvarlist
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, defvarlist);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(defvarlist);
 
-        RESULT = PLSymbolFactory.defvar(var, defvarlist, null);
+        RESULT = PLSymbolFactory.defvar(var, defvarlist, fakeSemiColons);
     :}
     ;
 
@@ -307,6 +316,14 @@ defvarlist ::=
     | defvarlist:defvarlist SEMI_COLONS:semiColons defvaritem:defvaritem
     {:
         defvarlist.addVarList(semiColons, defvaritem);
+        RESULT = defvarlist;
+    :}
+    | defvarlist:defvarlist defvaritem:defvaritem
+    {:
+        error(SyntaxError.MISSING_SEMI_COLONS, defvarlist);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(defvarlist);
+
+        defvarlist.addVarList(fakeSemiColons, defvaritem);
         RESULT = defvarlist;
     :}
     ;
@@ -338,14 +355,26 @@ defproc ::=
     | PROCEDURE:procedure IDENTIFIER:identifier formal_paramlist:formal_paramlist SEMI_COLONS:semiColons blq:blq
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, blq);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(blq);
 
-        RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, semiColons, blq, null);
+        RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, semiColons, blq, fakeSemiColons);
     :}
     | PROCEDURE:procedure IDENTIFIER:identifier formal_paramlist:formal_paramlist blq:blq SEMI_COLONS:semiColons
     {:
-        error(SyntaxError.MISSING_SEMI_COLONS, blq);
+        error(SyntaxError.MISSING_SEMI_COLONS, formal_paramlist);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(formal_paramlist);
 
-        RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, null, blq, semiColons);
+        RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, fakeSemiColons, blq, semiColons);
+    :}
+    | PROCEDURE:procedure IDENTIFIER:identifier formal_paramlist:formal_paramlist blq:blq
+    {:
+        error(SyntaxError.MISSING_SEMI_COLONS, formal_paramlist);
+        TerminalSymbol fakeSemiColonsA = PLSymbolFactory.fakeSemiColons(formal_paramlist);
+
+        error(SyntaxError.MISSING_SEMI_COLONS, blq);
+        TerminalSymbol fakeSemiColonsB = PLSymbolFactory.fakeSemiColons(blq);
+
+        RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, fakeSemiColonsA, blq, fakeSemiColonsB);
     :}
     ;
 
@@ -357,14 +386,26 @@ deffun ::=
     | FUNCTION:function IDENTIFIER:identifier formal_paramlist:formal_paramlist COLONS:colons alltypes:alltypes SEMI_COLONS:semiColons blq:blq
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, blq);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(blq);
 
-        RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, semiColons, blq, null);
+        RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, semiColons, blq, fakeSemiColons);
     :}
     | FUNCTION:function IDENTIFIER:identifier formal_paramlist:formal_paramlist COLONS:colons alltypes:alltypes blq:blq SEMI_COLONS:semiColons
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, alltypes);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(alltypes);
 
-        RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, null, blq, semiColons);
+        RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, fakeSemiColons, blq, semiColons);
+    :}
+    | FUNCTION:function IDENTIFIER:identifier formal_paramlist:formal_paramlist COLONS:colons alltypes:alltypes blq:blq
+    {:
+        error(SyntaxError.MISSING_SEMI_COLONS, alltypes);
+        TerminalSymbol fakeSemiColonsA = PLSymbolFactory.fakeSemiColons(alltypes);
+
+        error(SyntaxError.MISSING_SEMI_COLONS, blq);
+        TerminalSymbol fakeSemiColonsB = PLSymbolFactory.fakeSemiColons(blq);
+
+        RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, fakeSemiColonsA, blq, fakeSemiColonsB);
     :}
     ;
 
@@ -384,6 +425,14 @@ formal_param ::=
     | formal_param_item:formal_param_item SEMI_COLONS:semiColons formal_param:formal_param
     {:
         formal_param.addParam(formal_param_item, semiColons);
+        RESULT = formal_param;
+    :}
+    | formal_param_item:formal_param_item formal_param:formal_param
+    {:
+        error(SyntaxError.MISSING_SEMI_COLONS, formal_param_item);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(formal_param_item);
+
+        formal_param.addParam(formal_param_item, fakeSemiColons);
         RESULT = formal_param;
     :}
     ;
@@ -418,8 +467,9 @@ sent ::=
     | asig:asig
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, asig);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(asig);
 
-        RESULT = PLSymbolFactory.sent(asig, null);
+        RESULT = PLSymbolFactory.sent(asig, fakeSemiColons);
     :}
     | prog_call:prog_call SEMI_COLONS:semiColons
     {:
@@ -428,8 +478,9 @@ sent ::=
     | prog_call:prog_call
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, prog_call);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(prog_call);
 
-        RESULT = PLSymbolFactory.sent(prog_call, null);
+        RESULT = PLSymbolFactory.sent(prog_call, fakeSemiColons);
     :}
     | exeblq:exeblq
     {:
@@ -632,8 +683,9 @@ dcllist_blq ::=
     | dcllist_blq:dcllist_blq dcl_blq:dcl_blq
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, dcllist_blq);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(dcllist_blq);
 
-        dcllist_blq.addBlq(null, dcl_blq);
+        dcllist_blq.addBlq(fakeSemiColons, dcl_blq);
         RESULT = PLSymbolFactory.dcllist_blq();
     :}
     |  /* empty dcllist_blq */
@@ -680,6 +732,13 @@ type ::=
       IDENTIFIER:identifier EQ:eq udtype:udtype SEMI_COLONS:semiColons
     {:
         RESULT = PLSymbolFactory.type(identifier, eq, udtype, semiColons);
+    :}
+    | IDENTIFIER:identifier EQ:eq udtype:udtype
+    {:
+        error(SyntaxError.MISSING_SEMI_COLONS, udtype);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(udtype);
+
+        RESULT = PLSymbolFactory.type(identifier, eq, udtype, fakeSemiColons);
     :}
     ;
 

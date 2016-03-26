@@ -6,7 +6,7 @@ public class FactorSubParamPLSymbol extends FactorPLSymbol {
     private final SubParamListPLSymbol subParamList;
 
     public FactorSubParamPLSymbol(TerminalSymbol identifier, SubParamListPLSymbol subparamlist) {
-        super(subparamlist);
+        super(subparamlist != null ? subparamlist : identifier);
         this.identfier = identifier;
         this.subParamList = subparamlist;
     }
