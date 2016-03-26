@@ -1,3 +1,6 @@
+import symbols.Location;
+import symbols.PLSymbolFactory;
+
 public enum LexicalError {
     UNCLOSED_COMMENT {
         @Override
@@ -28,6 +31,11 @@ public enum LexicalError {
         public String comment() {
             return "Invalid identifier";
         }
+
+        @Override
+        public Location location(int line, int column) {
+            return PLSymbolFactory.location(line, column);
+        }
     },
     ILEGAL_CHARACTER {
         @Override
@@ -35,4 +43,8 @@ public enum LexicalError {
     };
 
     public abstract String comment();
+
+    public Location location(int line, int column) {
+        return PLSymbolFactory.location(line, column);
+    }
 }

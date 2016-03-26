@@ -12,10 +12,16 @@ import symbols.PLSymbolFactory;
 %column
 
 %init{
+    errors = 0;
 %init}
 
 %{
     private static boolean DEBUG = false;
+    private int errors;
+
+    public int getErrors() {
+        return errors;
+    }
 
     private Symbol symbol(int type) {
         return symbol(type, yyline+1, yycolumn+1, yytext());
@@ -32,11 +38,12 @@ import symbols.PLSymbolFactory;
     }
 
     private void error (LexicalError error) {
-        System.err.println("LEXICAL ERROR");
-        System.err.println("Line " + (yyline + 1) + ", Column " + (yycolumn + 1));
-        System.err.println(error.comment());
-        System.err.println();
-        //System.exit(0);
+        errors++;
+        StringBuilder sb = new StringBuilder();
+        sb.append("LexicalError => ");
+        sb.append(error.location(yyline + 1, yycolumn + 1));
+        sb.append(": " + error.comment());
+        System.out.println(sb.toString());
     }
 
     private String parseString (String s) {
@@ -89,6 +96,7 @@ IdentifierFirstChar = {Letter} | "_"
 IdentifierValidChar = {IdentifierFirstChar} | {Number}
 Identifier = {IdentifierFirstChar} {IdentifierValidChar}*
 
+InvalidIdentifier = {Digit}+ {IdentifierValidChar}+
 //InvalidIdentifierFirstChar = [^a-zA-Z_ \t\f\r\n]
 //IdentifierInvalidChar = [^a-zA-Z_0-9 \t\f\r\n]
 //InvalidIdentifier = {InvalidIdentifierFirstChar} {IdentifierValidChar}?
@@ -221,11 +229,12 @@ String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
     {FloatConstant}     { return symbol(sym.NUMERIC_REAL_CONST); }
 
     {Identifier}        { return symbol(sym.IDENTIFIER); }
-    /*
+
     {InvalidIdentifier} {
          error(LexicalError.INVALID_IDENTIFIER);
+         return symbol(sym.IDENTIFIER, "fakeIdentifier");
     }
-    */
+
     {WhiteSpace}        {}
     [^]                 { error(LexicalError.ILEGAL_CHARACTER); }
 

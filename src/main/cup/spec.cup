@@ -14,7 +14,8 @@ action code{:
     private int errors = 0;
 
     public int getErrors() {
-        return errors;
+        Lexer lexScanner = (Lexer) getScanner();
+        return errors + lexScanner.getErrors();
     }
 
     public void error(SyntaxError error, Localizable symbol) {
@@ -174,7 +175,7 @@ start with initial;
 initial ::=
       prg:prg
     {:
-        RESULT = PLSymbolFactory.initial(prg, errors);
+        RESULT = PLSymbolFactory.initial(prg, getErrors());
     :}
     ;
 
