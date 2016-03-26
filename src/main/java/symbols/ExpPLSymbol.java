@@ -1,18 +1,16 @@
 package symbols;
 
-/**
- * Created by dlopez on 24/3/16.
- */
-public class ExpPLSymbol extends PLSymbol {
+public abstract class ExpPLSymbol extends PLSymbol {
 
-    private FactorPLSymbol factor;
-
-    ExpPLSymbol(FactorPLSymbol f) {
-        factor = f;
+    public ExpPLSymbol(PLSymbol lastSymbol) {
+        super(lastSymbol);
     }
 
-    @Override
-    public Location endLocation() {
-        return factor.endLocation();
+    public static ExpPLSymbol create(ExpPLSymbol expA, OpPLSymbol op, ExpPLSymbol expB) {
+        return new ExpOpPLSymbol(expA, op, expB);
+    }
+
+    public static ExpPLSymbol create(FactorPLSymbol factor) {
+        return new ExpFactorPLSymbol(factor);
     }
 }

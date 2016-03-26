@@ -1,18 +1,25 @@
 package symbols;
 
-/**
- * Created by dlopez on 24/3/16.
- */
-public class IdPLSymbol extends PLSymbol {
+public abstract class IdPLSymbol extends PLSymbol {
 
-    private TerminalSymbol identifier;
-
-    IdPLSymbol(TerminalSymbol i) {
-        identifier = i;
+    IdPLSymbol(PLSymbol lastSymbol) {
+        super(lastSymbol);
     }
 
-    @Override
-    public Location endLocation() {
-        return identifier.getLocation();
+    public static IdPLSymbol create(TerminalSymbol identifier) {
+        return new IdSimplePLSymbol(identifier);
+    }
+
+    public static IdPLSymbol create(
+            TerminalSymbol identifier,
+            TerminalSymbol leftBracket,
+            ExpPLSymbol exp,
+            TerminalSymbol rightBracket
+    ) {
+        return new IdArrayPLSymbol(identifier, leftBracket, exp, rightBracket);
+    }
+
+    public static IdPLSymbol create(TerminalSymbol identifierA, TerminalSymbol dot, TerminalSymbol identifierB) {
+        return new IdRecordPLSymbol(identifierA, dot, identifierB);
     }
 }

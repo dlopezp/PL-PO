@@ -1,5 +1,7 @@
 import java_cup.runtime.*;
 
+import symbols.PLSymbolFactory;
+
 %%
 
 %class Lexer
@@ -19,14 +21,14 @@ import java_cup.runtime.*;
         return symbol(type, yyline+1, yycolumn+1, yytext());
     }
 
-    private Symbol symbol(int type, Object value) {
+    private Symbol symbol(int type, String value) {
         return symbol(type, yyline+1, yycolumn+1, value);
     }
 
-    private Symbol symbol(int type, int line, int column, Object value) {
+    private Symbol symbol(int type, int line, int column, String value) {
         String intFormat = "%3d";
         if (DEBUG) print("LexDebug => (" + String.format(intFormat, line) +", "+String.format(intFormat, column)+") ["+String.format(intFormat, type)+"] " + value);
-        return new Symbol(type, line, column, value);
+        return new Symbol(type, line, column, PLSymbolFactory.terminal(value, line, column));
     }
 
     private void error (LexicalError error) {

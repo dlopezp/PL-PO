@@ -1,21 +1,19 @@
 package symbols;
 
-/**
- * Created by dlopez on 24/3/16.
- */
 public class AsigPLSymbol extends PLSymbol {
 
     private IdPLSymbol id;
-    private String assign;
+    private TerminalSymbol assign;
     private ExpPLSymbol exp;
 
-    AsigPLSymbol(IdPLSymbol i, String a, ExpPLSymbol e) {
-        id = i;
-        assign = a;
-        exp = e;
+    public AsigPLSymbol(IdPLSymbol id, TerminalSymbol assign, ExpPLSymbol exp) {
+        super(exp);
+        this.id = id;
+        this.assign = assign;
+        this.exp = exp;
     }
 
-    public Location endLocation() {
-        return exp.endLocation();
+    public static AsigPLSymbol create(IdPLSymbol id, TerminalSymbol assign, ExpPLSymbol exp) {
+        return new AsigPLSymbol(id, assign, exp);
     }
 }

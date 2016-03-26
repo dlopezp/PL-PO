@@ -3,24 +3,36 @@ package symbols;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class DefVarListPLSymbol extends PLSymbol {
 
-    private List<DefVarPLSymbol> defvars;
+    private List<DefVarItemPLSymbol> defvars;
+    private List<TerminalSymbol> semiColons;
 
-    DefVarListPLSymbol(VarListPLSymbol vl, AllTypesPLSymbol at) {
-        defvars = new ArrayList<DefVarPLSymbol>();
-        addVarList(new DefVarPLSymbol(vl, at));
+    public DefVarListPLSymbol(DefVarItemPLSymbol defVarItem) {
+        super(defVarItem);
+        defvars = new ArrayList<DefVarItemPLSymbol>();
+        semiColons = new ArrayList<TerminalSymbol>();
+        addVarList(defVarItem);
     }
 
-    private void addVarList(DefVarPLSymbol defVar) {
-        defvars.add(defVar);
+    private void addVarList(DefVarItemPLSymbol defVarItem) {
+        defvars.add(defVarItem);
     }
 
-    @Override
-    public Location endLocation() {
-        return null;
+    public void addVarList(
+            TerminalSymbol semiColons,
+            VarListPLSymbol varlist,
+            TerminalSymbol colons,
+            AllTypesPLSymbol alltypes
+    ) {
+        this.semiColons.add(semiColons);
+        addVarList(new DefVarItemPLSymbol(varlist, colons, alltypes));
+    }
+
+    public static DefVarListPLSymbol create(
+            VarListPLSymbol varlist,
+            TerminalSymbol colons,
+            AllTypesPLSymbol alltypes) {
+        return new DefVarListPLSymbol(new DefVarItemPLSymbol(varlist, colons, alltypes));
     }
 }

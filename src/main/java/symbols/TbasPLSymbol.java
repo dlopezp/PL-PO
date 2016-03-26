@@ -2,14 +2,14 @@ package symbols;
 
 public class TbasPLSymbol extends PLSymbol {
 
-    private TerminalSymbol identifier;
+    private TerminalSymbol value;
 
-    TbasPLSymbol(TerminalSymbol i) {
-        identifier = i;
+    TbasPLSymbol(TerminalSymbol value) {
+        super(value);
+        this.value = value;
     }
 
-    @Override
-    public Location endLocation() {
-        return identifier.getLocation();
+    public static TbasPLSymbol create(TerminalSymbol value) {
+        return new TbasPLSymbol(value);
     }
 }

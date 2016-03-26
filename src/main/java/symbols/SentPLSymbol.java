@@ -1,18 +1,36 @@
 package symbols;
 
-/**
- * Created by dlopez on 24/3/16.
- */
-public class SentPLSymbol extends PLSymbol {
+public abstract class SentPLSymbol extends PLSymbol {
 
-    private AsigPLSymbol asig;
-
-    SentPLSymbol(AsigPLSymbol a) {
-        asig = a;
+    SentPLSymbol(PLSymbol lastSymbol) {
+        super(lastSymbol);
     }
 
-    @Override
-    public Location endLocation() {
-        return asig.endLocation();
+    public static SentPLSymbol create(AsigPLSymbol asig, TerminalSymbol semiColons) {
+        return new SentAsigPLSymbol(asig, semiColons);
+    }
+
+    public static SentPLSymbol create(ProgCallPLSymbol progCall, TerminalSymbol semiColons) {
+        return new SentProgCallPLSymbol(progCall, semiColons);
+    }
+
+    public static SentPLSymbol create(ExeBlqPLSymbol exeblq) {
+        return new SentExeBlqPLSymbol(exeblq);
+    }
+
+    public static SentPLSymbol create(CondPLSymbol cond) {
+        return new SentCondPLSymbol(cond);
+    }
+
+    public static SentPLSymbol create(WLoopPLSymbol wloop) {
+        return new SentWLoopPLSymbol(wloop);
+    }
+
+    public static SentPLSymbol create(FLoopPLSymbol floop) {
+        return new SentFLoopPLSymbol(floop);
+    }
+
+    public static SentPLSymbol create(CasePLSymbol case_) {
+        return new SentCasePLSymbol(case_);
     }
 }

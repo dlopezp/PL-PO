@@ -1,18 +1,15 @@
 package symbols;
 
-/**
- * Created by dlopez on 24/3/16.
- */
 public class SimpValuePLSymbol extends PLSymbol {
 
     private TerminalSymbol value;
 
-    SimpValuePLSymbol(TerminalSymbol v) {
+    public SimpValuePLSymbol(TerminalSymbol v) {
+        super(v);
         value = v;
     }
 
-    @Override
-    public Location endLocation() {
-        return value.endLocation();
+    public static SimpValuePLSymbol create(TerminalSymbol value) {
+        return new SimpValuePLSymbol(value);
     }
 }

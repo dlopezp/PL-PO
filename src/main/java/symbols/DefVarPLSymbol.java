@@ -1,16 +1,28 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
-public class DefVarPLSymbol {
+public class DefVarPLSymbol extends PLSymbol {
 
-    private VarListPLSymbol varList;
-    private AllTypesPLSymbol allTypes;
+    private final TerminalSymbol var;
+    private final DefVarListPLSymbol defvarlist;
+    private final TerminalSymbol semiColons;
 
-    public DefVarPLSymbol(VarListPLSymbol vl, AllTypesPLSymbol at) {
-        varList = vl;
-        allTypes = at;
+    public DefVarPLSymbol(TerminalSymbol var, DefVarListPLSymbol defvarlist, TerminalSymbol semiColons) {
+        super(semiColons);
+        this.var = var;
+        this.defvarlist = defvarlist;
+        this.semiColons = semiColons;
     }
 
+    @Override
+    public Location endLocation() {
+        return null;
+    }
+
+    public static DefVarPLSymbol create(
+            TerminalSymbol var,
+            DefVarListPLSymbol defvarlist,
+            TerminalSymbol semiColons
+    ) {
+        return new DefVarPLSymbol(var, defvarlist, semiColons);
+    }
 }

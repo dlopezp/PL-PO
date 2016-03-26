@@ -1,9 +1,10 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public abstract class AllTypesPLSymbol extends PLSymbol {
+
+    AllTypesPLSymbol(PLSymbol lastSymbol) {
+        super(lastSymbol);
+    }
 
     public static AllTypesPLSymbol build(TbasPLSymbol tbas) {
         return new AllTypesPLSymbolTbas(tbas);

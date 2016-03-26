@@ -1,8 +1,5 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class FLoopPLSymbol extends PLSymbol {
 
     private TerminalSymbol for_;
@@ -24,7 +21,7 @@ public class FLoopPLSymbol extends PLSymbol {
             TerminalSymbol do_,
             SentPLSymbol sent
     ) {
-        super();
+        super(sent);
         this.for_ = for_;
         this.identifier = identifier;
         this.assign = assign;
@@ -35,8 +32,16 @@ public class FLoopPLSymbol extends PLSymbol {
         this.sent = sent;
     }
 
-    @Override
-    public Location endLocation() {
-        return sent.endLocation();
+    public static FLoopPLSymbol create(
+            TerminalSymbol for_,
+            TerminalSymbol identifier,
+            TerminalSymbol assign,
+            ExpPLSymbol expA,
+            TerminalSymbol to,
+            ExpPLSymbol expB,
+            TerminalSymbol do_,
+            SentPLSymbol sent
+    ) {
+        return new FLoopPLSymbol(for_, identifier, assign, expA, to, expB, do_, sent);
     }
 }

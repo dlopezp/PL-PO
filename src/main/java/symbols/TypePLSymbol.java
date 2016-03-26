@@ -1,8 +1,5 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class TypePLSymbol extends PLSymbol {
 
     private final TerminalSymbol identifier;
@@ -10,7 +7,7 @@ public class TypePLSymbol extends PLSymbol {
     private final PLSymbol edtype;
 
     public TypePLSymbol(TerminalSymbol identifier, TerminalSymbol eq, PLSymbol udtype) {
-        super();
+        super(udtype);
         this.identifier = identifier;
         this.eq = eq;
         this.edtype = udtype;

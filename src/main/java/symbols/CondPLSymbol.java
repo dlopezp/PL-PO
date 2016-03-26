@@ -1,8 +1,5 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class CondPLSymbol extends PLSymbol {
 
     private final TerminalSymbol if_;
@@ -12,7 +9,7 @@ public class CondPLSymbol extends PLSymbol {
     private final PLSymbol elsecond;
 
     public CondPLSymbol(TerminalSymbol if_, PLSymbol exp, TerminalSymbol then, PLSymbol sent, PLSymbol elsecond) {
-        super();
+        super(elsecond);
         this.if_ = if_;
         this.exp = exp;
         this.then = then;
@@ -20,8 +17,13 @@ public class CondPLSymbol extends PLSymbol {
         this.elsecond = elsecond;
     }
 
-    @Override
-    public Location endLocation() {
-        return elsecond.endLocation();
+    public static CondPLSymbol create(
+            TerminalSymbol if_,
+            ExpPLSymbol exp,
+            TerminalSymbol then,
+            SentPLSymbol sent,
+            ElseCondPLSymbol elsecond
+    ) {
+        return new CondPLSymbol(if_, exp, then, sent, elsecond);
     }
 }

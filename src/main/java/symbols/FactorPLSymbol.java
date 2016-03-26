@@ -1,18 +1,51 @@
 package symbols;
 
-/**
- * Created by dlopez on 24/3/16.
- */
-public class FactorPLSymbol extends PLSymbol {
+public abstract class FactorPLSymbol extends PLSymbol {
 
-    private SimpValuePLSymbol simpValue;
-
-    FactorPLSymbol(SimpValuePLSymbol sv) {
-        simpValue = sv;
+    public FactorPLSymbol(PLSymbol lastSymbol) {
+        super(lastSymbol);
     }
 
-    @Override
-    public Location endLocation() {
-        return simpValue.endLocation();
+    public static FactorPLSymbol create(SimpValuePLSymbol simpvalue) {
+        return new FactorSimpPLSymbol(simpvalue);
+    }
+
+    public static FactorPLSymbol create(
+            TerminalSymbol not,
+            FactorPLSymbol factor
+    ) {
+        return new FactorNotPLSymbol(not, factor);
+    }
+
+    public static FactorPLSymbol create(
+            TerminalSymbol leftParenthesis,
+            ExpPLSymbol exp,
+            TerminalSymbol rightParenthesis
+    ) {
+        return new FactorExpPLSymbol(leftParenthesis, exp, rightParenthesis);
+    }
+
+    public static FactorPLSymbol create(
+            TerminalSymbol identifier,
+            SubParamListPLSymbol subparamlist
+    ) {
+        return new FactorSubParamPLSymbol(identifier, subparamlist);
+    }
+
+    public static FactorPLSymbol create(
+            TerminalSymbol identifier,
+            TerminalSymbol leftBracket,
+            ExpPLSymbol exp,
+            TerminalSymbol rightBracket
+    ) {
+        return new FactorArrayPLSymbol(identifier, leftBracket, exp, rightBracket);
+    }
+
+    public static FactorPLSymbol create(
+            TerminalSymbol identifierA,
+            TerminalSymbol dot,
+            TerminalSymbol identifierB
+    ) {
+        return new FactorRecordPLSymbol(identifierA, dot, identifierB);
     }
 }

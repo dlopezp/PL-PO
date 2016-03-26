@@ -19,7 +19,7 @@ end;
 var
 	medida: REAL;
 	valor1, valor2: INTEGER;
-	type MiArray = array[1..2] of INTEGER;
+    type MiArray = array[1..2] of INTEGER;
 begin
 	medida := $4.A;
 	valor1 := -3;

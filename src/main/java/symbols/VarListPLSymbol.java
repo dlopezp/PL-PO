@@ -8,6 +8,7 @@ public class VarListPLSymbol extends PLSymbol {
     private List<TerminalSymbol> identifiers;
 
     public VarListPLSymbol(TerminalSymbol identifier) {
+        super(identifier);
         identifiers = new ArrayList<TerminalSymbol>();
         addIdentifier(identifier);
     }
@@ -16,8 +17,12 @@ public class VarListPLSymbol extends PLSymbol {
         identifiers.add(identifier);
     }
 
-    @Override
-    public Location endLocation() {
-        return identifiers.get(0).endLocation();
+    public void add(TerminalSymbol identifier, TerminalSymbol comma) {
+        identifiers.add(comma);
+        identifiers.add(identifier);
+    }
+
+    public static VarListPLSymbol create(TerminalSymbol identifier) {
+        return new VarListPLSymbol(identifier);
     }
 }

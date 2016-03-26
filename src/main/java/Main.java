@@ -1,4 +1,4 @@
-import symbols.ResultPLSymbol;
+import symbols.InitialPLSymbol;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,7 +16,7 @@ public class Main {
                 try {
                     lexer = new Lexer(new FileReader(args[i]));
                     Parser parser = new Parser(lexer);
-                    ResultPLSymbol result = (ResultPLSymbol) parser.parse().value;
+                    InitialPLSymbol result = (InitialPLSymbol) parser.parse().value;
 
                     System.out.println("\nSalida: \n"+ result);
                 }

@@ -3,25 +3,26 @@ package symbols;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class CaseListPLSymbol extends PLSymbol {
 
     private List<CaseSimplePLSymbol> cases;
 
-    CaseListPLSymbol(ExpPLSymbol exp, TerminalSymbol colons, SentPLSymbol sent, TerminalSymbol semiColons) {
-        super();
+    public CaseListPLSymbol(ExpPLSymbol exp, TerminalSymbol colons, SentPLSymbol sent, TerminalSymbol semiColons) {
+        super(semiColons);
         cases = new ArrayList<CaseSimplePLSymbol>();
-        addCase(new CaseSimplePLSymbol(exp, colons, sent, semiColons));
+        addCase(exp, colons, sent, semiColons);
     }
 
-    public void addCase(CaseSimplePLSymbol caseSimple) {
-        cases.add(caseSimple);
+    public void addCase(ExpPLSymbol exp, TerminalSymbol colons, SentPLSymbol sent, TerminalSymbol semiColons) {
+        cases.add(new CaseSimplePLSymbol(exp, colons, sent, semiColons));
     }
 
-    @Override
-    public Location endLocation() {
-        return cases.get(0).endLocation();
+    public static CaseListPLSymbol create(
+            ExpPLSymbol exp,
+            TerminalSymbol colons,
+            SentPLSymbol sent,
+            TerminalSymbol semiColons
+    ) {
+        return new CaseListPLSymbol(exp, colons, sent, semiColons);
     }
 }

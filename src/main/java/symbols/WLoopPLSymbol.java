@@ -1,8 +1,5 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class WLoopPLSymbol extends PLSymbol {
 
     private TerminalSymbol while_;
@@ -16,16 +13,14 @@ public class WLoopPLSymbol extends PLSymbol {
             TerminalSymbol do_,
             SentPLSymbol sent
     ) {
-        super();
+        super(sent);
         this.while_ = while_;
         this.exp = exp;
         this.do_ = do_;
         this.sent = sent;
     }
 
-    @Override
-    public Location endLocation() {
-        return sent.endLocation();
+    public static WLoopPLSymbol create(TerminalSymbol while_, ExpPLSymbol exp, TerminalSymbol do_, SentPLSymbol sent) {
+        return new WLoopPLSymbol(while_, exp, do_, sent);
     }
-
 }

@@ -1,8 +1,5 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
 public class CasePLSymbol extends PLSymbol {
 
     private TerminalSymbol case_;
@@ -18,7 +15,7 @@ public class CasePLSymbol extends PLSymbol {
             CaseListPLSymbol caselist,
             TerminalSymbol end
     ) {
-        super();
+        super(end);
         this.case_ = case_;
         this.exp = exp;
         this.of = of;
@@ -26,8 +23,13 @@ public class CasePLSymbol extends PLSymbol {
         this.end = end;
     }
 
-    @Override
-    public Location endLocation() {
-        return end.endLocation();
+    public static CasePLSymbol create(
+            TerminalSymbol case_,
+            ExpPLSymbol exp,
+            TerminalSymbol of,
+            CaseListPLSymbol caselist,
+            TerminalSymbol end
+    ) {
+        return new CasePLSymbol(case_, exp, of, caselist, end);
     }
 }

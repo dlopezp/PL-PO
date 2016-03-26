@@ -1,23 +1,29 @@
 package symbols;
 
-/**
- * Created by dlopez on 25/3/16.
- */
-public class UdTypePLSymbol extends PLSymbol {
+public abstract class UdTypePLSymbol extends PLSymbol {
 
-    private final TerminalSymbol record;
-    private final PLSymbol defvarlist;
-    private final TerminalSymbol end;
-
-    public UdTypePLSymbol(TerminalSymbol record, PLSymbol defvarlist, TerminalSymbol end) {
-        super();
-        this.record = record;
-        this.defvarlist = defvarlist;
-        this.end = end;
+    UdTypePLSymbol(PLSymbol lastSymbol) {
+        super(lastSymbol);
     }
 
-    @Override
-    public Location endLocation() {
-        return end.endLocation();
+    public static UdTypePLSymbol create(
+            TerminalSymbol array_,
+            TerminalSymbol leftBracket,
+            SimpValuePLSymbol simpvalueA,
+            TerminalSymbol doubleDot,
+            SimpValuePLSymbol simpvalueB,
+            TerminalSymbol rightBracket,
+            TerminalSymbol of,
+            AllTypesPLSymbol alltypes
+    ) {
+        return new UdTypeArrayPLSymbol(array_, leftBracket, simpvalueA, doubleDot, simpvalueB, rightBracket, of, alltypes);
+    }
+
+    public static UdTypePLSymbol create(
+            TerminalSymbol record,
+            DefVarListPLSymbol defvarlist,
+            TerminalSymbol end
+    ) {
+        return new UdTypeRecordPLSymbol(record, defvarlist, end);
     }
 }
