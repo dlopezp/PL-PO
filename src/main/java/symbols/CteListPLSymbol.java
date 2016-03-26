@@ -13,7 +13,7 @@ public class CteListPLSymbol extends PLSymbol {
         addCte(cte);
     }
 
-    private void addCte(CtePLSymbol cte) {
+    public void addCte(CtePLSymbol cte) {
         ctes.add(cte);
     }
 
@@ -27,12 +27,9 @@ public class CteListPLSymbol extends PLSymbol {
     }
 
     public static CteListPLSymbol create(
-            TerminalSymbol identifier,
-            TerminalSymbol eq,
-            SimpValuePLSymbol simpvalue,
-            TerminalSymbol semiColons
+            CtePLSymbol cte
     ) {
-        return new CteListPLSymbol(new CtePLSymbol(identifier, eq, simpvalue, semiColons));
+        return new CteListPLSymbol(cte);
     }
 
 }

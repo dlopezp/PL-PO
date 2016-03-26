@@ -108,6 +108,8 @@ non terminal AsigPLSymbol               asig;
 non terminal BlqPLSymbol                blq;
 non terminal CasePLSymbol               case;
 non terminal CaseListPLSymbol           caselist;
+non terminal CaseSimplePLSymbol         casesimple;
+non terminal CtePLSymbol                cte;
 non terminal CteListPLSymbol            ctelist;
 non terminal CondPLSymbol               cond;
 non terminal DclPLSymbol                dcl;
@@ -119,6 +121,7 @@ non terminal DefFunPLSymbol             deffun;
 non terminal DefProcPLSymbol            defproc;
 non terminal DefTypePLSymbol            deftype;
 non terminal DefVarPLSymbol             defvar;
+non terminal DefVarItemPLSymbol         defvaritem;
 non terminal DefVarListPLSymbol         defvarlist;
 non terminal ElseCondPLSymbol           elsecond;
 non terminal ExeBlqPLSymbol             exeblq;
@@ -127,6 +130,7 @@ non terminal ExpListPLSymbol            explist;
 non terminal FactorPLSymbol             factor;
 non terminal FLoopPLSymbol              floop;
 non terminal FormalParamPLSymbol        formal_param;
+non terminal FormalParamItemPLSymbol    formal_param_item;
 non terminal FormalParamListPLSymbol    formal_paramlist;
 non terminal IdPLSymbol                 id;
 non terminal InitialPLSymbol            initial;
@@ -141,6 +145,7 @@ non terminal SentListPLSymbol           sentlist;
 non terminal SimpValuePLSymbol          simpvalue;
 non terminal SubParamListPLSymbol       subpparamlist;
 non terminal TbasPLSymbol               tbas;
+non terminal TypePLSymbol               type;
 non terminal TypeListPLSymbol           typelist;
 non terminal UdTypePLSymbol             udtype;
 non terminal VarListPLSymbol            varlist;
@@ -248,27 +253,21 @@ defcte ::=
     ;
 
 ctelist ::=
+      cte:cte
+    {:
+        RESULT = PLSymbolFactory.ctelist(cte);
+    :}
+    | ctelist:ctelist cte:cte
+    {:
+        ctelist.addCte(cte);
+        RESULT = ctelist;
+    :}
+    ;
+
+cte ::=
       IDENTIFIER:identifier EQ:eq simpvalue:simpvalue SEMI_COLONS:semiColons
     {:
-        RESULT = PLSymbolFactory.ctelist(identifier, eq, simpvalue, semiColons);
-    :}
-    | IDENTIFIER:identifier EQ:eq simpvalue:simpvalue
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, simpvalue);
-
-        RESULT = PLSymbolFactory.ctelist(identifier, eq, simpvalue, null);
-    :}
-    | ctelist:ctelist IDENTIFIER:identifier EQ:eq simpvalue:simpvalue SEMI_COLONS:semiColons
-    {:
-        ctelist.addCte(identifier, eq, simpvalue, semiColons);
-        RESULT = ctelist;
-    :}
-    | ctelist:ctelist IDENTIFIER:identifier EQ:eq simpvalue:simpvalue
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, simpvalue);
-
-        ctelist.addCte(identifier, eq, simpvalue, null);
-        RESULT = ctelist;
+        RESULT = PLSymbolFactory.cte(identifier, eq, simpvalue, semiColons);
     :}
     ;
 
@@ -301,21 +300,21 @@ defvar ::=
     ;
 
 defvarlist ::=
+      defvaritem:defvaritem
+    {:
+        RESULT = PLSymbolFactory.defvarlist(defvaritem);
+    :}
+    | defvarlist:defvarlist SEMI_COLONS:semiColons defvaritem:defvaritem
+    {:
+        defvarlist.addVarList(semiColons, defvaritem);
+        RESULT = defvarlist;
+    :}
+    ;
+
+defvaritem ::=
       varlist:varlist COLONS:colons alltypes:alltypes
     {:
-        RESULT = PLSymbolFactory.defvarlist(varlist, colons, alltypes);
-    :}
-    | defvarlist:defvarlist SEMI_COLONS:semiColons varlist:varlist COLONS:colons alltypes:alltypes
-    {:
-        defvarlist.addVarList(semiColons, varlist, colons, alltypes);
-        RESULT = defvarlist;
-    :}
-    | defvarlist:defvarlist varlist:varlist COLONS:colons alltypes:alltypes
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, defvarlist);
-
-        defvarlist.addVarList(null, varlist, colons, alltypes);
-        RESULT = defvarlist;
+        RESULT = PLSymbolFactory.defvaritem(varlist, colons, alltypes);
     :}
     ;
 
@@ -378,21 +377,21 @@ formal_paramlist ::=
     ;
 
 formal_param ::=
+      formal_param_item:formal_param_item
+    {:
+        RESULT = PLSymbolFactory.formal_param(formal_param_item);
+    :}
+    | formal_param_item:formal_param_item SEMI_COLONS:semiColons formal_param:formal_param
+    {:
+        formal_param.addParam(formal_param_item, semiColons);
+        RESULT = formal_param;
+    :}
+    ;
+
+formal_param_item ::=
       varlist:varlist COLONS:colons alltypes:alltypes
     {:
-        RESULT = PLSymbolFactory.formal_param(varlist, colons, alltypes);
-    :}
-    | varlist:varlist COLONS:colons alltypes:alltypes SEMI_COLONS:semiColons formal_param:formal_param
-    {:
-        formal_param.addParam(varlist, colons, alltypes, semiColons);
-        RESULT = formal_param;
-    :}
-    | varlist:varlist COLONS:colons alltypes:alltypes formal_param:formal_param
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, alltypes);
-
-        formal_param.addParam(varlist, colons, alltypes, null);
-        RESULT = formal_param;
+        RESULT = PLSymbolFactory.formal_param_item(varlist, colons, alltypes);
     :}
     ;
 
@@ -666,27 +665,21 @@ deftype ::=
     ;
 
 typelist ::=
+      type:type
+    {:
+        RESULT = PLSymbolFactory.typelist(type);
+    :}
+    | type:type typelist:typelist
+    {:
+        typelist.addType(type);
+        RESULT = typelist;
+    :}
+    ;
+
+type ::=
       IDENTIFIER:identifier EQ:eq udtype:udtype SEMI_COLONS:semiColons
     {:
-        RESULT = PLSymbolFactory.typelist(identifier, eq, udtype, semiColons);
-    :}
-    | IDENTIFIER:identifier EQ:eq udtype:udtype
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, udtype);
-
-        RESULT = PLSymbolFactory.typelist(identifier, eq, udtype, null);
-    :}
-    | IDENTIFIER:identifier EQ:eq udtype:udtype SEMI_COLONS:semiColons typelist:typelist
-    {:
-        typelist.addType(identifier, eq, udtype, semiColons);
-        RESULT = typelist;
-    :}
-    | IDENTIFIER:identifier EQ:eq udtype:udtype typelist:typelist
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, udtype);
-
-        typelist.addType(identifier, eq, udtype, null);
-        RESULT = typelist;
+        RESULT = PLSymbolFactory.type(identifier, eq, udtype, semiColons);
     :}
     ;
 
@@ -750,26 +743,20 @@ case ::=
     ;
 
 caselist ::=
-      exp:exp COLONS:colons sent:sent SEMI_COLONS:semiColons
+      casesimple:casesimple
     {:
-        RESULT = PLSymbolFactory.caselist(exp, colons, sent, semiColons);
+        RESULT = PLSymbolFactory.caselist(casesimple);
     :}
-    | exp:exp COLONS:colons sent:sent
+    | casesimple:casesimple caselist:caselist
     {:
-        error(SyntaxError.MISSING_SEMI_COLONS, sent);
-
-        RESULT = PLSymbolFactory.caselist(exp, colons, sent, null);
-    :}
-    | exp:exp COLONS:colons sent:sent SEMI_COLONS:semiColons caselist:caselist
-    {:
-        caselist.addCase(exp, colons, sent, semiColons);
+        caselist.addCase(casesimple);
         RESULT = caselist;
     :}
-    | exp:exp COLONS:colons sent:sent caselist:caselist
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, sent);
+    ;
 
-        caselist.addCase(exp, colons, sent, null);
-        RESULT = caselist;
+casesimple ::=
+      exp:exp COLONS:colons sent:sent
+    {:
+        RESULT = PLSymbolFactory.casesimple(exp, colons, sent);
     :}
     ;

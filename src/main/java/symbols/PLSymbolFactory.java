@@ -63,12 +63,18 @@ public class PLSymbolFactory {
     }
 
     public static CteListPLSymbol ctelist(
+            CtePLSymbol cte
+    ) {
+        return CteListPLSymbol.create(cte);
+    }
+
+    public static CtePLSymbol cte(
             TerminalSymbol identifier,
             TerminalSymbol eq,
             SimpValuePLSymbol simpvalue,
             TerminalSymbol semiColons
     ) {
-        return CteListPLSymbol.create(identifier, eq, simpvalue, semiColons);
+        return CtePLSymbol.create(identifier, eq, simpvalue, semiColons);
     }
 
     public static SimpValuePLSymbol simpvalue(TerminalSymbol value) {
@@ -84,11 +90,17 @@ public class PLSymbolFactory {
     }
 
     public static DefVarListPLSymbol defvarlist(
+            DefVarItemPLSymbol defvaritem
+    ) {
+        return DefVarListPLSymbol.create(defvaritem);
+    }
+
+    public static DefVarItemPLSymbol defvaritem(
             VarListPLSymbol varlist,
             TerminalSymbol colons,
             AllTypesPLSymbol alltypes
     ) {
-        return DefVarListPLSymbol.create(varlist, colons, alltypes);
+        return DefVarItemPLSymbol.create(varlist, colons, alltypes);
     }
 
     public static VarListPLSymbol varlist(TerminalSymbol identifier) {
@@ -137,11 +149,17 @@ public class PLSymbolFactory {
     }
 
     public static FormalParamPLSymbol formal_param(
+            FormalParamItemPLSymbol formal_param_item
+    ) {
+        return FormalParamPLSymbol.create(formal_param_item);
+    }
+
+    public static FormalParamItemPLSymbol formal_param_item(
             VarListPLSymbol varlist,
             TerminalSymbol colons,
             AllTypesPLSymbol alltypes
     ) {
-        return FormalParamPLSymbol.create(varlist, colons, alltypes);
+        return FormalParamItemPLSymbol.create(varlist, colons, alltypes);
     }
 
     public static TbasPLSymbol tbas(TerminalSymbol value) {
@@ -323,12 +341,18 @@ public class PLSymbolFactory {
     }
 
     public static TypeListPLSymbol typelist(
+            TypePLSymbol type
+    ) {
+        return TypeListPLSymbol.create(type);
+    }
+
+    public static TypePLSymbol type(
             TerminalSymbol identifier,
             TerminalSymbol eq,
             UdTypePLSymbol udtype,
             TerminalSymbol semiColons
     ) {
-        return TypeListPLSymbol.create(identifier, eq, udtype, semiColons);
+        return TypePLSymbol.create(identifier, eq, udtype, semiColons);
     }
 
     public static UdTypePLSymbol udtype(
@@ -410,12 +434,17 @@ public class PLSymbolFactory {
     }
 
     public static CaseListPLSymbol caselist(
+            CaseSimplePLSymbol casesimple
+    ) {
+        return CaseListPLSymbol.create(casesimple);
+    }
+
+    public static CaseSimplePLSymbol casesimple(
             ExpPLSymbol exp,
             TerminalSymbol colons,
-            SentPLSymbol sent,
-            TerminalSymbol semiColons
+            SentPLSymbol sent
     ) {
-        return CaseListPLSymbol.create(exp, colons, sent, semiColons);
+        return CaseSimplePLSymbol.create(exp, colons, sent);
     }
 
     public static Location location(int line, int column) {
@@ -425,4 +454,5 @@ public class PLSymbolFactory {
     public static Object terminal(String value, int line, int column) {
         return new TerminalSymbol(value, location(line, column));
     }
+
 }

@@ -12,4 +12,12 @@ public class DefVarItemPLSymbol extends PLSymbol {
         this.colons = colons;
         this.alltypes = alltypes;
     }
+
+    public static DefVarItemPLSymbol create(
+            VarListPLSymbol varlist,
+            TerminalSymbol colons,
+            AllTypesPLSymbol alltypes
+    ) {
+        return new DefVarItemPLSymbol(varlist, colons, alltypes);
+    }
 }

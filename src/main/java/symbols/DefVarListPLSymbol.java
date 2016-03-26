@@ -21,18 +21,15 @@ public class DefVarListPLSymbol extends PLSymbol {
 
     public void addVarList(
             TerminalSymbol semiColons,
-            VarListPLSymbol varlist,
-            TerminalSymbol colons,
-            AllTypesPLSymbol alltypes
+            DefVarItemPLSymbol defvaritem
     ) {
         this.semiColons.add(semiColons);
-        addVarList(new DefVarItemPLSymbol(varlist, colons, alltypes));
+        addVarList(defvaritem);
     }
 
     public static DefVarListPLSymbol create(
-            VarListPLSymbol varlist,
-            TerminalSymbol colons,
-            AllTypesPLSymbol alltypes) {
-        return new DefVarListPLSymbol(new DefVarItemPLSymbol(varlist, colons, alltypes));
+            DefVarItemPLSymbol defvaritem
+    ) {
+        return new DefVarListPLSymbol(defvaritem);
     }
 }

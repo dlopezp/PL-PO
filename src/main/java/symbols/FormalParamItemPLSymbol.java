@@ -16,4 +16,12 @@ public class FormalParamItemPLSymbol extends PLSymbol {
         this.colons = colons;
         this.alltypes = alltypes;
     }
+
+    public static FormalParamItemPLSymbol create(
+            VarListPLSymbol varlist,
+            TerminalSymbol colons,
+            AllTypesPLSymbol alltypes
+    ) {
+        return new FormalParamItemPLSymbol(varlist, colons, alltypes);
+    }
 }

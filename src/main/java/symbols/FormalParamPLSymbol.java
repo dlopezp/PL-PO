@@ -19,22 +19,15 @@ public class FormalParamPLSymbol extends PLSymbol {
         params.add(formalParamItem);
     }
 
-    public void addParam(
-            VarListPLSymbol varlist,
-            TerminalSymbol colons,
-            AllTypesPLSymbol alltypes,
-            TerminalSymbol semiColons
-    ) {
-        addParam(new FormalParamItemPLSymbol(varlist, colons, alltypes));
+    public void addParam(FormalParamItemPLSymbol formal_param_item, TerminalSymbol semiColons) {
+        addParam(formal_param_item);
         this.semiColons.add(semiColons);
     }
 
     public static FormalParamPLSymbol create(
-            VarListPLSymbol varlist,
-            TerminalSymbol colons,
-            AllTypesPLSymbol alltypes
+            FormalParamItemPLSymbol formal_param_item
     ) {
-        return new FormalParamPLSymbol(new FormalParamItemPLSymbol(varlist, colons, alltypes));
+        return new FormalParamPLSymbol(formal_param_item);
     }
 
 }
