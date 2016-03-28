@@ -27,6 +27,11 @@ public class DefVarListPLSymbol extends PLSymbol {
         addVarList(defvaritem);
     }
 
+    @Override
+    public Location endLocation() {
+        return defvars.get(defvars.size() - 1).endLocation();
+    }
+
     public static DefVarListPLSymbol create(
             DefVarItemPLSymbol defvaritem
     ) {
