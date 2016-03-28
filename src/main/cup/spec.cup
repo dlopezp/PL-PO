@@ -2,8 +2,6 @@ import java_cup.runtime.*;
 import java.util.List;
 import java.util.ArrayList;
 
-import symbols.Localizable;
-
 import symbols.*;
 import symbols.Location;
 import symbols.PLSymbolFactory;
@@ -23,20 +21,30 @@ action code{:
         StringBuilder sb = new StringBuilder();
         sb.append("SyntaxError => ");
         sb.append(error.location(symbol));
-        sb.append(": " + error.comment());
+        sb.append(" " + error.comment());
+        System.out.println(sb.toString());
+    }
+
+    public void error(SyntaxError error, int line, int column) {
+        errors++;
+        StringBuilder sb = new StringBuilder();
+        sb.append("SyntaxError => ");
+        sb.append(error.location(line, column));
+        sb.append(" " + error.comment());
         System.out.println(sb.toString());
     }
 :}
 
 parser code {:
+/*
     public void syntax_error (Symbol currentToken) {
         StringBuilder sb = new StringBuilder();
         sb.append("Syntax Error => ");
-        sb.append(", Line: "+currentToken.left);
-        sb.append(", Column: "+currentToken.right);
-        sb.append(", Value: "+currentToken.value);
+        //sb.append("Line: "+currentToken.left);
+        //sb.append(", Column: "+currentToken.right);
+        sb.append(currentToken.value);
         List<Integer> ids = expected_token_ids();
-        sb.append("\nExpected: ");
+        sb.append("\n\tExpected: ");
         for (Integer id:ids) {
             sb.append(symbl_name_from_id(id)+", ");
         }
@@ -45,6 +53,22 @@ parser code {:
         sb.append("\n");
         report_error(sb.toString(), null);
     }
+*/
+/*
+    public void report_error(String message, Object info) {
+        if (info instanceof String){
+    	errors++;
+          System.err.println(errors + " ==> " + info + " "+ message +"\n");
+        }
+        else {
+        	StringBuffer m = new StringBuffer("Error ");
+        	if (info instanceof java_cup.runtime.Symbol)
+         	   m.append( "("+info.toString()+")" );
+        	m.append(" : "+message);
+        	System.err.println(m);
+        }
+      }
+*/
 :}
 
 terminal TerminalSymbol
@@ -152,6 +176,8 @@ non terminal UdTypePLSymbol             udtype;
 non terminal VarListPLSymbol            varlist;
 non terminal WLoopPLSymbol              wloop;
 
+precedence left error;
+
 precedence left SEMI_COLONS;
 
 precedence left ELSE;
@@ -184,13 +210,22 @@ prg ::=
     {:
         RESULT = PLSymbolFactory.prg(program, identifier, semiColons, blq, dot);
     :}
+    /*
     | PROGRAM:program IDENTIFIER:identifier blq:blq DOT:dot
     {:
-        error(SyntaxError.MISSING_SEMI_COLONS, dot);
-        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(dot);
+        error(SyntaxError.MISSING_SEMI_COLONS, identifier);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(identifier);
 
         RESULT = PLSymbolFactory.prg(program, identifier, fakeSemiColons, blq, dot);
     :}
+    | PROGRAM:program IDENTIFIER:identifier SEMI_COLONS:semiColons blq:blq
+    {:
+        error(SyntaxError.MISSING_FINAL_DOT, blq);
+        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(blq);
+
+        RESULT = PLSymbolFactory.prg(program, identifier, semiColons, blq, fakeSemiColons);
+    :}
+    */
     ;
 
 blq ::=
@@ -198,6 +233,17 @@ blq ::=
     {:
         RESULT = PLSymbolFactory.blq(dcllist, begin, sentlist, end);
     :}
+/*
+    | dcllist BEGIN error:e END
+    {:
+        error(SyntaxError.BLQ, eleft, eright);
+    :}
+
+    | dcllist BEGIN error:e
+    {:
+        error(SyntaxError.BLQ, eleft, eright);
+    :}
+*/
     ;
 
 dcllist ::=
@@ -222,6 +268,14 @@ sentlist ::=
         sentlist.addSent(sent);
         RESULT = sentlist;
     :}
+/*
+    | error:e SEMI_COLONS
+    {:
+        error(SyntaxError.SENTLIST, eleft, eright);
+
+        RESULT = PLSymbolFactory.sentlist();
+    :}
+*/
     ;
 
 dcl ::=
@@ -245,6 +299,7 @@ dcl ::=
     {:
         RESULT = PLSymbolFactory.dcl(deftype);
     :}
+
     ;
 
 defcte ::=
@@ -264,6 +319,10 @@ ctelist ::=
         ctelist.addCte(cte);
         RESULT = ctelist;
     :}
+    /*
+    | error:e
+    {: error(SyntaxError.CTELIST, eleft, eright); :}
+    */
     ;
 
 cte ::=
@@ -271,6 +330,7 @@ cte ::=
     {:
         RESULT = PLSymbolFactory.cte(identifier, eq, simpvalue, semiColons);
     :}
+    /*
     | IDENTIFIER:identifier EQ:eq simpvalue:simpvalue
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, simpvalue);
@@ -278,6 +338,7 @@ cte ::=
 
         RESULT = PLSymbolFactory.cte(identifier, eq, simpvalue, fakeSemiColons);
     :}
+    */
     ;
 
 simpvalue ::=
@@ -300,6 +361,7 @@ defvar ::=
     {:
         RESULT = PLSymbolFactory.defvar(var, defvarlist, semiColons);
     :}
+    /*
     | VAR:var defvarlist:defvarlist
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, defvarlist);
@@ -307,6 +369,7 @@ defvar ::=
 
         RESULT = PLSymbolFactory.defvar(var, defvarlist, fakeSemiColons);
     :}
+    */
     ;
 
 defvarlist ::=
@@ -319,6 +382,7 @@ defvarlist ::=
         defvarlist.addVarList(semiColons, defvaritem);
         RESULT = defvarlist;
     :}
+    /*
     | defvarlist:defvarlist defvaritem:defvaritem
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, defvarlist);
@@ -327,6 +391,7 @@ defvarlist ::=
         defvarlist.addVarList(fakeSemiColons, defvaritem);
         RESULT = defvarlist;
     :}
+    */
     ;
 
 defvaritem ::=
@@ -346,6 +411,10 @@ varlist ::=
         varlist.add(identifier, comma);
         RESULT = varlist;
     :}
+    /*
+    | IDENTIFIER error:e
+    {: error(SyntaxError.VARLIST, eleft, eright); :}
+    */
     ;
 
 defproc ::=
@@ -353,6 +422,7 @@ defproc ::=
     {:
         RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, semiColonsA, blq, semiColonsB);
     :}
+    /*
     | PROCEDURE:procedure IDENTIFIER:identifier formal_paramlist:formal_paramlist SEMI_COLONS:semiColons blq:blq
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, blq);
@@ -377,6 +447,10 @@ defproc ::=
 
         RESULT = PLSymbolFactory.defproc(procedure, identifier, formal_paramlist, fakeSemiColonsA, blq, fakeSemiColonsB);
     :}
+
+    | PROCEDURE error:e SEMI_COLONS blq SEMI_COLONS
+    {: error(SyntaxError.PROCEDURE_HEADER, eleft, eright); :}
+*/
     ;
 
 deffun ::=
@@ -384,6 +458,7 @@ deffun ::=
     {:
         RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, semiColonsA, blq, semiColonsB);
     :}
+    /*
     | FUNCTION:function IDENTIFIER:identifier formal_paramlist:formal_paramlist COLONS:colons alltypes:alltypes SEMI_COLONS:semiColons blq:blq
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, blq);
@@ -408,6 +483,9 @@ deffun ::=
 
         RESULT = PLSymbolFactory.deffun(function, identifier, formal_paramlist, colons, alltypes, fakeSemiColonsA, blq, fakeSemiColonsB);
     :}
+    | FUNCTION error:e
+    {: error(SyntaxError.FUNCTION, eleft, eright); :}
+    */
     ;
 
 formal_paramlist ::=
@@ -415,6 +493,10 @@ formal_paramlist ::=
     {:
         RESULT = PLSymbolFactory.formal_paramlist(leftParenthesis, formal_param, rightParenthesis);
     :}
+    /*
+    | LEFT_PARENTHESIS error:e RIGHT_PARENTHESIS
+    {: error(SyntaxError.FORMAL_PARAM_LIST, eleft, eright); :}
+    */
     |  /* empty formal_paramlist */
     ;
 
@@ -428,6 +510,7 @@ formal_param ::=
         formal_param.addParam(formal_param_item, semiColons);
         RESULT = formal_param;
     :}
+    /*
     | formal_param_item:formal_param_item formal_param:formal_param
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, formal_param_item);
@@ -436,6 +519,7 @@ formal_param ::=
         formal_param.addParam(formal_param_item, fakeSemiColons);
         RESULT = formal_param;
     :}
+    */
     ;
 
 formal_param_item ::=
@@ -465,6 +549,7 @@ sent ::=
     {:
         RESULT = PLSymbolFactory.sent(asig, semiColons);
     :}
+    /*
     | asig:asig
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, asig);
@@ -472,10 +557,12 @@ sent ::=
 
         RESULT = PLSymbolFactory.sent(asig, fakeSemiColons);
     :}
+    */
     | prog_call:prog_call SEMI_COLONS:semiColons
     {:
         RESULT = PLSymbolFactory.sent(prog_call, semiColons);
     :}
+    /*
     | prog_call:prog_call
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, prog_call);
@@ -483,6 +570,7 @@ sent ::=
 
         RESULT = PLSymbolFactory.sent(prog_call, fakeSemiColons);
     :}
+    */
     | exeblq:exeblq
     {:
         RESULT = PLSymbolFactory.sent(exeblq);
@@ -503,6 +591,19 @@ sent ::=
     {:
         RESULT = PLSymbolFactory.sent(case_);
     :}
+/*
+    | IDENTIFIER error:e SEMI_COLONS
+    {:
+        error(SyntaxError.SENTENCE, eleft, eright);
+
+    :}
+
+    | error:e SEMI_COLONS
+    {:
+        error(SyntaxError.SENTENCE, eleft, eright);
+
+    :}
+*/
     ;
 
 asig ::=
@@ -536,6 +637,10 @@ exp ::=
     {:
         RESULT = PLSymbolFactory.exp(factor);
     :}
+/*
+    | error:e
+    {: error(SyntaxError.EXP, eleft, eright); :}
+*/
     ;
 
 op ::=
@@ -551,6 +656,10 @@ op ::=
     {:
         RESULT = PLSymbolFactory.op(oparit);
     :}
+    /*
+    | error:e
+    {: error(SyntaxError.OP, eleft, eright); :}
+    */
     ;
 
 opcomp ::=
@@ -673,6 +782,10 @@ exeblq ::=
     {:
         RESULT = PLSymbolFactory.exeblq(dcllist_blq, begin, sentlist, end);
     :}
+/*
+    | error:e END
+    {: error(SyntaxError.EXEBLQ, eleft, eright); :}
+*/
     ;
 
 dcllist_blq ::=
@@ -681,6 +794,7 @@ dcllist_blq ::=
         dcllist_blq.addBlq(semiColons, dcl_blq);
         RESULT = dcllist_blq;
     :}
+    /*
     | dcllist_blq:dcllist_blq dcl_blq:dcl_blq
     {:
         error(SyntaxError.MISSING_SEMI_COLONS, dcllist_blq);
@@ -689,6 +803,7 @@ dcllist_blq ::=
         dcllist_blq.addBlq(fakeSemiColons, dcl_blq);
         RESULT = PLSymbolFactory.dcllist_blq();
     :}
+    */
     |  /* empty dcllist_blq */
     {:
         RESULT = PLSymbolFactory.dcllist_blq();
@@ -708,6 +823,10 @@ dcl_blq ::=
     {:
         RESULT = PLSymbolFactory.dcl_blq(defvar);
     :}
+    /*
+    |  error:e
+    {: error(SyntaxError.DCL_BLQ, eleft, eright); :}
+    */
     ;
 
 deftype ::=
@@ -734,19 +853,11 @@ type ::=
     {:
         RESULT = PLSymbolFactory.type(identifier, eq, udtype, semiColons);
     :}
-    | IDENTIFIER:identifier EQ:eq udtype:udtype
-    {:
-        error(SyntaxError.MISSING_SEMI_COLONS, udtype);
-        TerminalSymbol fakeSemiColons = PLSymbolFactory.fakeSemiColons(udtype);
-
-        RESULT = PLSymbolFactory.type(identifier, eq, udtype, fakeSemiColons);
-    :}
     ;
 
 udtype ::=
       ARRAY:array_ LEFT_BRACKET:leftBracket simpvalue:simpvalueA DOUBLE_DOT:doubleDot simpvalue:simpvalueB RIGHT_BRACKET:rightBracket OF:of alltypes:alltypes
     {:
-        // Checkear rango array
         int bottom = ((TerminalSymbolInteger) simpvalueA.getValue()).getValue();
         int top = ((TerminalSymbolInteger) simpvalueB.getValue()).getValue();
         if (bottom >= top) {
