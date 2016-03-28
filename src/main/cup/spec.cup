@@ -747,6 +747,11 @@ udtype ::=
       ARRAY:array_ LEFT_BRACKET:leftBracket simpvalue:simpvalueA DOUBLE_DOT:doubleDot simpvalue:simpvalueB RIGHT_BRACKET:rightBracket OF:of alltypes:alltypes
     {:
         // Checkear rango array
+        int bottom = ((TerminalSymbolInteger) simpvalueA.getValue()).getValue();
+        int top = ((TerminalSymbolInteger) simpvalueB.getValue()).getValue();
+        if (bottom >= top) {
+            error(SyntaxError.BAD_ARRAY_RANGE, leftBracket);
+        }
         RESULT = PLSymbolFactory.udtype(array_, leftBracket, simpvalueA, doubleDot, simpvalueB, rightBracket, of, alltypes);
     :}
     | RECORD:record defvarlist:defvarlist END:end

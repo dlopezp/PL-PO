@@ -9,6 +9,10 @@ public class SimpValuePLSymbol extends PLSymbol {
         value = v;
     }
 
+    public TerminalSymbol getValue() {
+        return value;
+    }
+
     public static SimpValuePLSymbol create(TerminalSymbol value) {
         return new SimpValuePLSymbol(value);
     }

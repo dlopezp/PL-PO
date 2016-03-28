@@ -8,4 +8,8 @@ public class TerminalSymbolInteger extends TerminalSymbol {
         super(raw, location);
         this.value = value;
     }
+
+    public int getValue() {
+        return value;
+    }
 }
