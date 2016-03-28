@@ -451,12 +451,39 @@ public class PLSymbolFactory {
         return new Location(line, column);
     }
 
-    public static TerminalSymbol terminal(String value, int line, int column) {
-        return new TerminalSymbol(value, location(line, column));
+    public static TerminalSymbol terminal(String raw, int line, int column) {
+        return terminal(raw, raw, line, column);
     }
 
-    public static TerminalSymbol terminal(String value, Location location) {
-        return new TerminalSymbol(value, location);
+    public static TerminalSymbol terminal(String raw, Location location) {
+        return terminal(raw, raw, location.getLine(), location.getColumn());
+    }
+
+    public static TerminalSymbol terminal(
+            String raw,
+            String value,
+            int line,
+            int column
+    ) {
+        return TerminalSymbol.create(raw, value, location(line, column));
+    }
+
+    public static TerminalSymbol terminal(
+            String raw,
+            int value,
+            int line,
+            int column
+    ) {
+        return TerminalSymbol.create(raw, value, location(line, column));
+    }
+
+    public static TerminalSymbol terminal(
+            String raw,
+            float value,
+            int line,
+            int column
+    ) {
+        return TerminalSymbol.create(raw, value, location(line, column));
     }
 
     public static TerminalSymbol fakeSemiColons(PLSymbol precedence) {

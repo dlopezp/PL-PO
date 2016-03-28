@@ -24,17 +24,34 @@ import symbols.PLSymbolFactory;
     }
 
     private Symbol symbol(int type) {
-        return symbol(type, yyline+1, yycolumn+1, yytext());
+        return symbol(type, yyline+1, yycolumn+1, yytext(), yytext());
     }
 
     private Symbol symbol(int type, String value) {
-        return symbol(type, yyline+1, yycolumn+1, value);
+        return symbol(type, yyline+1, yycolumn+1, value, yytext());
     }
 
-    private Symbol symbol(int type, int line, int column, String value) {
-        String intFormat = "%3d";
-        if (DEBUG) print("LexDebug => (" + String.format(intFormat, line) +", "+String.format(intFormat, column)+") ["+String.format(intFormat, type)+"] " + value);
-        return new Symbol(type, line, column, PLSymbolFactory.terminal(value, line, column));
+    private Symbol symbol(int type, int value) {
+        return symbol(type, yyline+1, yycolumn+1, value, yytext());
+    }
+
+    private Symbol symbol(int type, float value) {
+        return symbol(type, yyline+1, yycolumn+1, value, yytext());
+    }
+
+    private Symbol symbol(int type, int line, int column, String raw, String value) {
+        if (DEBUG) printDebug(type, line, column, raw);
+        return new Symbol(type, line, column, PLSymbolFactory.terminal(raw, value, line, column));
+    }
+
+    private Symbol symbol(int type, int line, int column, int value, String raw) {
+        if (DEBUG) printDebug(type, line, column, raw);
+        return new Symbol(type, line, column, PLSymbolFactory.terminal(raw, value, line, column));
+    }
+
+    private Symbol symbol(int type, int line, int column, float value, String raw) {
+        if (DEBUG) printDebug(type, line, column, raw);
+        return new Symbol(type, line, column, PLSymbolFactory.terminal(raw, value, line, column));
     }
 
     private void error (LexicalError error) {
@@ -50,21 +67,45 @@ import symbols.PLSymbolFactory;
         return s.replaceAll("''", "'");
     }
 
-    private void print (String s) {
-        System.out.println(s);
+    private int parseDecimal (String decimalText) {
+        int result;
+        if (decimalText.contains("$")) {
+            result = parseHexDecimal(decimalText);
+        } else {
+            result = Integer.parseInt(decimalText);
+        }
+        return result;
     }
 
-    private void print () {
-        if (DEBUG) System.out.println(yytext());
+    private int parseHexDecimal(String decimalText) {
+        return Integer.parseInt(decimalText.replace("$", ""), 16);
+    }
 
+    private float parseFloat (String floatText) {
+        float result;
+        if (floatText.contains("$")) {
+            result = parseHexFloat(floatText);
+        } else {
+            result = Float.parseFloat(floatText.replace("$", ""));
+        }
+        return result;
+    }
+
+    private float parseHexFloat(String floatText) {
+        String[] parts = floatText.replace("$", "").split("\\.");
+        int integerValue = Integer.parseInt(parts[0], 16);
+        int floatValue = Integer.parseInt(parts[1], 16);
+        return Float.parseFloat(String.valueOf(integerValue) + "." + String.valueOf(floatValue));
+    }
+
+    private void printDebug (int type, int line, int column, String value) {
+        String intFormat = "%3d";
+        System.out.println("LexDebug => (" + String.format(intFormat, line) +", "+String.format(intFormat, column)+") ["+String.format(intFormat, type)+"] " + value);
     }
 %}
 
-%eof{
-%eof}
 
 LineTerminator = \r|\n|\r\n
-//InputCharacter = [^\r\n]
 BlankSpace = [ \t\f]
 WhiteSpace = {LineTerminator} | {BlankSpace}
 
@@ -88,7 +129,6 @@ InvalidComment2 = {CommentDelimiterBegin2} ([^(*\))])+
 Comment2 = {InvalidComment2}{CommentDelimiterEnd2}
 
 Comment = {Comment1} | {Comment2}
-//InvalidComment = {InvalidComment1} | {InvalidComment2}
 CommentDelimiterEnd = {CommentDelimiterEnd1} | {CommentDelimiterEnd2}
 
 /* identifiers */
@@ -97,9 +137,6 @@ IdentifierValidChar = {IdentifierFirstChar} | {Number}
 Identifier = {IdentifierFirstChar} {IdentifierValidChar}*
 
 InvalidIdentifier = {Digit}+ {IdentifierValidChar}+
-//InvalidIdentifierFirstChar = [^a-zA-Z_ \t\f\r\n]
-//IdentifierInvalidChar = [^a-zA-Z_0-9 \t\f\r\n]
-//InvalidIdentifier = {InvalidIdentifierFirstChar} {IdentifierValidChar}?
 
 /* integer literals */
 Sign = [+-]
@@ -112,12 +149,10 @@ HexDecimalConstant = "$" {Sign}? {HexDigit}+
 DecimalConstant = {IntegerDecimalConstant} | {HexDecimalConstant}
 
 /* floating point literals */
-//IntegerFloatConstant = {IntegerDecimalConstant} "." [0-9]+
 IntegerFloatConstant = {IntegerDecimalConstant} "." {Digit}+
 HexFloatConstant = {HexDecimalConstant} "." {HexDigit}+
 FloatConstant = {IntegerFloatConstant} | {HexFloatConstant}
 
-//NumericConstant = {DecimalConstant} | {FloatConstant}
 
 /* string and character literals */
 StringDelimiter = "'"
@@ -126,31 +161,16 @@ StringValidContent = [^'\n] | {StringDelimiterInside}
 
 UnclosedString = {StringDelimiter} ({StringValidContent})*;
 UnopenString = ({StringValidContent})* {StringDelimiter};
-//InvalidString = {UnclosedString} | {UnopenString}
 String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
-//String2 = {UnclosedString} {StringDelimiter}
 
-//%s COMMENT_1, COMMENT_2
 
 %%
 
 <YYINITIAL> {
 
-    {Comment} {
-        print("Comment: "+yytext());
-    }
+    {Comment} {}
 
-/*
-    {CommentDelimiterBegin1} {
-        yybegin(COMMENT_1);
-    }
-
-    {CommentDelimiterBegin2} {
-        yybegin(COMMENT_2);
-    }
-*/
     {CommentDelimiterEnd} {
-        print("CommentDelimiterEnd:");
         error(LexicalError.UNOPEN_COMMENT);
     }
 
@@ -159,12 +179,10 @@ String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
     }
 
     {UnclosedString} {
-        print("UnclosedString:");
         error(LexicalError.UNCLOSED_STRING);
     }
 
     {UnopenString} {
-        print("UnopenString:");
         error(LexicalError.UNOPEN_STRING);
     }
 
@@ -225,8 +243,8 @@ String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
     "or"                { return symbol(sym.OR); }
 
 
-    {DecimalConstant}   { return symbol(sym.NUMERIC_INTEGER_CONST); }
-    {FloatConstant}     { return symbol(sym.NUMERIC_REAL_CONST); }
+    {DecimalConstant}   { return symbol(sym.NUMERIC_INTEGER_CONST, parseDecimal(yytext())); }
+    {FloatConstant}     { return symbol(sym.NUMERIC_REAL_CONST, parseFloat(yytext())); }
 
     {Identifier}        { return symbol(sym.IDENTIFIER); }
 
@@ -239,21 +257,3 @@ String = {StringDelimiter} ({StringValidContent})* {StringDelimiter}
     [^]                 { error(LexicalError.ILEGAL_CHARACTER); }
 
 }
-
-/*
-<COMMENT_1> {
-    {CommentDelimiterEnd1} {
-        yybegin(YYINITIAL);
-    }
-}
-
-<COMMENT_2> {
-    {CommentDelimiterEnd2} {
-        yybegin(YYINITIAL);
-    }
-}
-
-<COMMENT_1, COMMENT_2> {
-    [^] {}
-}
-*/
