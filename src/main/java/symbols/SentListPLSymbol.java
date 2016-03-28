@@ -13,8 +13,17 @@ public class SentListPLSymbol extends PLSymbol {
         addSent(sent);
     }
 
+    public SentListPLSymbol() {
+        super(null);
+        sents = new ArrayList<SentPLSymbol>();
+    }
+
     public void addSent(SentPLSymbol sent) {
         sents.add(sent);
+    }
+
+    public static SentListPLSymbol create() {
+        return new SentListPLSymbol();
     }
 
     public static SentListPLSymbol create(SentPLSymbol sent) {

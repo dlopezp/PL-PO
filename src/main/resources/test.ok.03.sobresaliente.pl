@@ -16,13 +16,13 @@ begin
 	v1 := v2;
 	v2 := aux;
 end;
-var
-	medida: REAL;
-	valor1, valor2: INTEGER;
     type MiArray = array[1..2] of INTEGER;
     type MiRecord = record
         nombre: CHARACTER
     end;
+var
+	medida: REAL;
+	valor1, valor2: INTEGER;
 begin
 	medida := $4.A;
 	valor1 := -3;
